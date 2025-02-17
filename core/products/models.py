@@ -4,6 +4,7 @@ This file is used to define the models for the products app.
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from taggit.managers import TaggableManager
 
 from core.custom_user.models import User
 
@@ -39,13 +40,20 @@ class Product(models.Model):
         related_name="products",
     )
     name = models.CharField(max_length=100)
+
     category = models.ForeignKey(
         "ProductCategory",
         on_delete=models.CASCADE,
         related_name="products",
         null=True,
     )
+
+    tags = TaggableManager(
+        help_text="Use tags to add health benefits, Hair growth, etc.",
+    )
+
     description = models.TextField()
+    slug = models.SlugField(unique=True, max_length=250)
 
     unit = models.ForeignKey(
         ProductUnit,
@@ -59,8 +67,8 @@ class Product(models.Model):
         help_text="Is the product available for purchase?",
     )
 
-    updated = models.DateTimeField(auto_now=True)
-    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True, editable=False)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
 
     def __str__(self):
         """
@@ -105,6 +113,11 @@ class ProductVariant(models.Model):
         ),
     )
 
+    updated = models.DateTimeField(auto_now=True, editable=False)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+
+    slug = models.SlugField(unique=True, max_length=250)
+
     class Meta:
         # A product variant is unique by product, size, and flavor
         unique_together = ("product", "size", "flavor")
@@ -137,6 +150,15 @@ class ProductCategory(models.Model):
 
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True)
+
+    updated = models.DateTimeField(auto_now=True, editable=False)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+
+    slug = models.SlugField(unique=True, max_length=250)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Product categories"
 
     def __str__(self):
         """

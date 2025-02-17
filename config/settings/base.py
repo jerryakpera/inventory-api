@@ -47,6 +47,7 @@ DJANGO_APPS = [
 THIRD_PARTY_APPS = [
     "django_use_email_as_username.apps.DjangoUseEmailAsUsernameConfig",
     "core.custom_user.apps.CustomUserConfig",
+    "taggit",
 ]
 
 
@@ -183,3 +184,5 @@ MEDIA_URL = "/media/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+TAGGIT_CASE_INSENSITIVE = True
