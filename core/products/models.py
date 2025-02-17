@@ -120,7 +120,12 @@ class ProductVariant(models.Model):
 
     slug = models.SlugField(unique=True, max_length=250, editable=False)
 
-    image = models.ImageField(upload_to="product_variants/")
+    image = models.ImageField(
+        upload_to="product_variants/",
+        null=True,
+        blank=True,
+        help_text="An image of the product.",
+    )
 
     class Meta:
         # A product variant is unique by product, size, and flavor
