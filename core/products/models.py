@@ -120,6 +120,8 @@ class ProductVariant(models.Model):
 
     slug = models.SlugField(unique=True, max_length=250, editable=False)
 
+    image = models.ImageField(upload_to="product_variants/")
+
     class Meta:
         # A product variant is unique by product, size, and flavor
         unique_together = ("product", "size", "flavor")
@@ -144,22 +146,9 @@ class ProductVariant(models.Model):
 
         return f"{self.product.name} ({', '.join(details)})"
 
-    def get_default_image(self):
-        """
-        Return the default image for this product variant.
-
-        Returns
-        -------
-        str
-            The URL of the default image.
-        """
-        default_image = self.images.filter(is_default=True).first()
-
-        return default_image.image.url if default_image else None
-
     def save(self, *args, **kwargs):
         """
-        Ensure there is only one default image per variant.
+        Save the product variant and generate a slug if it does not exist.
 
         Parameters
         ----------
@@ -169,72 +158,10 @@ class ProductVariant(models.Model):
             Additional keyword arguments.
         """
         super().save(*args, **kwargs)
-
-        if self.images.filter(is_default=True).count() > 1:
-            raise ValidationError(
-                "Only one image can be set as default per product.",
-            )
 
         if not self.slug:
             slug_base = f"{self.product.name}-{self.size or ''}-{self.flavor or ''}"
             self.slug = slugify(slug_base)
-        super().save(*args, **kwargs)
-
-
-class ProductVariantImage(models.Model):
-    """
-    Stores images for product variants.
-    """
-
-    variant = models.ForeignKey(
-        ProductVariant,
-        on_delete=models.CASCADE,
-        related_name="images",
-    )
-    image = models.ImageField(upload_to="product_variants/")
-    is_default = models.BooleanField(default=False)
-
-    def __str__(self):
-        """
-        Return a string representation of the image.
-
-        Returns
-        -------
-        str
-            The string representation of the image.
-        """
-        return f"Image for {self.variant} - {'Default' if self.is_default else 'Secondary'}"
-
-    def clean(self):
-        """
-        Validate that a product variant does not exceed 3 images.
-        """
-
-        if self.is_default:
-            # Ensure no other image for this variant is default
-            if (
-                self.variant.images.filter(
-                    is_default=True,
-                )
-                .exclude(pk=self.pk)
-                .exists()
-            ):
-                raise ValidationError(
-                    "Only one image can be set as default.",
-                )
-
-    def save(self, *args, **kwargs):
-        """
-        Override save to enforce validation.
-
-        Parameters
-        ----------
-        *args : list
-            Additional positional arguments.
-        **kwargs : dict
-            Additional keyword arguments.
-        """
-        self.clean()
         super().save(*args, **kwargs)
 
 
