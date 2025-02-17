@@ -4,7 +4,13 @@ Admin configuration for the products app.
 
 from django.contrib import admin
 
-from .models import Product, ProductCategory, ProductUnit, ProductVariant
+from .models import (
+    Product,
+    ProductCategory,
+    ProductUnit,
+    ProductVariant,
+    ProductVariantImage,
+)
 
 admin.site.register(ProductUnit)
 
@@ -59,14 +65,45 @@ class ProductAdmin(admin.ModelAdmin):
     show_facets = admin.ShowFacets.ALWAYS
 
 
+class ProductVariantImageInline(admin.TabularInline):
+    """
+    Inline configuration for the ProductVariantImage model.
+    """
+
+    model = ProductVariantImage
+    extra = 1
+    max_num = 3
+
+
 @admin.register(ProductVariant)
 class ProductVariantAdmin(admin.ModelAdmin):
     """
     Admin configuration for the ProductVariant model.
     """
 
-    raw_id_fields = ["product"]
-    list_display = ("product", "price", "stock")
+    inlines = [ProductVariantImageInline]
+
+    def get_default_image(self, obj):
+        """
+        Return the default image of the product variant.
+
+        Parameters
+        ----------
+        obj : ProductVariant
+            The product variant instance.
+
+        Returns
+        -------
+        str
+            The default image of the product variant.
+        """
+
+        return obj.get_default_image()
+
+    get_default_image.short_description = "Default Image"
+
+    raw_id_fields = ["product", "author"]
+    list_display = ("product", "price", "stock", "get_default_image")
     list_filter = ("product",)
     search_fields = ("product__name",)
     ordering = [

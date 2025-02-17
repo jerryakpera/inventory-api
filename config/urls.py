@@ -16,8 +16,8 @@ if settings.DEBUG:
     from django.conf.urls.static import static
 
     urlpatterns += static(
-        settings.STATIC_URL,
-        document_root=settings.STATIC_ROOT,
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT,
     )
 
 admin.site.site_title = config(
