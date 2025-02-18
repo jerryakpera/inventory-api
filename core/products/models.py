@@ -2,7 +2,6 @@
 This file is used to define the models for the products app.
 """
 
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.text import slugify
@@ -27,6 +26,35 @@ class ProductUnit(models.Model):
         -------
         str
             The name of the unit.
+        """
+        return self.name
+
+
+class ProductCategory(models.Model):
+    """
+    Represents a category of products.
+    """
+
+    name = models.CharField(max_length=50, unique=True)
+    description = models.TextField(blank=True)
+
+    updated = models.DateTimeField(auto_now=True, editable=False)
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+
+    slug = models.SlugField(unique=True, max_length=250)
+
+    class Meta:
+        ordering = ["name"]
+        verbose_name_plural = "Product categories"
+
+    def __str__(self):
+        """
+        Return the name of the category.
+
+        Returns
+        -------
+        str
+            The name of the category.
         """
         return self.name
 
@@ -100,8 +128,17 @@ class ProductVariant(models.Model):
         related_name="variants",
     )
 
-    size = models.CharField(max_length=50, blank=True, null=True)
-    flavor = models.CharField(max_length=50, blank=True, null=True)
+    description = models.TextField(null=True, blank=True)
+
+    size = models.PositiveIntegerField(
+        default=0,
+        help_text="The size of the product.",
+    )
+    flavor = models.CharField(
+        max_length=50,
+        blank=True,
+        null=True,
+    )
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
@@ -130,8 +167,6 @@ class ProductVariant(models.Model):
     class Meta:
         # A product variant is unique by product, size, and flavor
         unique_together = ("product", "size", "flavor")
-        ordering = ["product", "size", "flavor"]
-        indexes = [models.Index(fields=["product", "size", "flavor"])]
 
     def __str__(self):
         """
@@ -143,6 +178,7 @@ class ProductVariant(models.Model):
             The string representation of the product variant.
         """
         details = []
+
         if self.size:
             details.append(f"{self.size}{self.product.unit.symbol}")
 
@@ -162,38 +198,8 @@ class ProductVariant(models.Model):
         **kwargs : dict
             Additional keyword arguments.
         """
-        super().save(*args, **kwargs)
-
         if not self.slug:
             slug_base = f"{self.product.name}-{self.size or ''}-{self.flavor or ''}"
             self.slug = slugify(slug_base)
+
         super().save(*args, **kwargs)
-
-
-class ProductCategory(models.Model):
-    """
-    Represents a category of products.
-    """
-
-    name = models.CharField(max_length=50, unique=True)
-    description = models.TextField(blank=True)
-
-    updated = models.DateTimeField(auto_now=True, editable=False)
-    created = models.DateTimeField(auto_now_add=True, editable=False)
-
-    slug = models.SlugField(unique=True, max_length=250)
-
-    class Meta:
-        ordering = ["name"]
-        verbose_name_plural = "Product categories"
-
-    def __str__(self):
-        """
-        Return the name of the category.
-
-        Returns
-        -------
-        str
-            The name of the category.
-        """
-        return self.name

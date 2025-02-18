@@ -24,14 +24,20 @@ django-taggit==6.1.0
     # via -r requirements.in
 django-use-email-as-username==1.4.0
     # via -r requirements.in
+faker==28.0.0
+    # via -r requirements.in
 jmespath==1.0.1
     # via
     #   boto3
     #   botocore
 pillow==10.4.0
     # via -r requirements.in
+psycopg2-binary==2.9.9
+    # via -r requirements.in
 python-dateutil==2.9.0.post0
-    # via botocore
+    # via
+    #   botocore
+    #   faker
 python-decouple==3.8
     # via -r requirements.in
 s3transfer==0.11.2
