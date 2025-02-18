@@ -15,8 +15,8 @@ class ProductUnitFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = ProductUnit
 
-    name = factory.Faker("word")
-    symbol = factory.Faker("word")
+    name = factory.LazyAttribute(lambda _: fake.word()[:10])
+    symbol = factory.LazyAttribute(lambda _: fake.word()[:10])
 
 
 class ProductCategoryFactory(factory.django.DjangoModelFactory):

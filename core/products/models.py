@@ -112,6 +112,40 @@ class Product(models.Model):
         return self.name
 
 
+class ProductPriceHistory(models.Model):
+    """
+    Stores the historical prices of product variants.
+    """
+
+    product_variant = models.ForeignKey(
+        "ProductVariant",
+        on_delete=models.CASCADE,
+        related_name="price_history",
+    )
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        validators=[
+            MinValueValidator(0),
+        ],
+    )
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-timestamp"]
+
+    def __str__(self):
+        """
+        Return a string representation of the price history.
+
+        Returns
+        -------
+        str
+            The string representation of the price history.
+        """
+        return f"{self.product_variant} - {self.price} ({self.timestamp.strftime('%Y-%m-%d')})"
+
+
 class ProductVariant(models.Model):
     """
     Represents a variant of a product with specific attributes like size and flavor.
@@ -168,6 +202,17 @@ class ProductVariant(models.Model):
         # A product variant is unique by product, size, and flavor
         unique_together = ("product", "size", "flavor")
 
+    def readable_name(self):
+        """
+        Return a human-readable name for the product variant.
+
+        Returns
+        -------
+        str
+            The human-readable name for the product variant.
+        """
+        return str(self)
+
     def __str__(self):
         """
         Return a string representation of the product variant.
@@ -190,16 +235,26 @@ class ProductVariant(models.Model):
     def save(self, *args, **kwargs):
         """
         Save the product variant and generate a slug if it does not exist.
+        Track price changes and store them in `ProductPriceHistory`.
 
         Parameters
         ----------
-        *args : list
-            Additional positional arguments.
+        *args : tuple
+            The positional arguments.
         **kwargs : dict
-            Additional keyword arguments.
+            The keyword arguments.
         """
         if not self.slug:
             slug_base = f"{self.product.name}-{self.size or ''}-{self.flavor or ''}"
             self.slug = slugify(slug_base)
+
+        # Check if the price has changed before saving
+        if self.pk:
+            previous = ProductVariant.objects.filter(pk=self.pk).first()
+            if previous and previous.price != self.price:
+                ProductPriceHistory.objects.create(
+                    product_variant=self,
+                    price=previous.price,
+                )
 
         super().save(*args, **kwargs)
