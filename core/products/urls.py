@@ -14,4 +14,9 @@ urlpatterns = [
         views.list_products,
         name="list-products",
     ),
+    path(
+        "<int:product_id>/",
+        views.get_product,
+        name="get-product",
+    ),
 ]

@@ -9,27 +9,6 @@ from core.api.utils import log_this
 
 
 @api_view(["GET"])
-def home(request):
-    """
-    View for the home endpoint.
-
-    Parameters
-    ----------
-    request : HttpRequest
-        The request object.
-
-    Returns
-    -------
-    Response
-        JSON response with a welcome message.
-    """
-
-    return Response(
-        {"message": "Welcome to the Inventory API!"},
-    )
-
-
-@api_view(["GET"])
 def health_check(request):
     """
     View for health check endpoint.

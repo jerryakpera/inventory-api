@@ -58,6 +58,23 @@ class ProductCategory(models.Model):
         """
         return self.name
 
+    # Create a save method that sets the slug if it does not exist
+    def save(self, *args, **kwargs):
+        """
+        Save the product category and generate a slug if it does not exist.
+
+        Parameters
+        ----------
+        *args : tuple
+            The positional arguments.
+        **kwargs : dict
+            The keyword arguments.
+        """
+        if not self.slug:
+            self.slug = slugify(self.name)
+
+        super().save(*args, **kwargs)
+
 
 class Product(models.Model):
     """
@@ -110,6 +127,23 @@ class Product(models.Model):
             The name of the product.
         """
         return self.name
+
+    # Create a save method that sets the slug if it does not exist
+    def save(self, *args, **kwargs):
+        """
+        Save the product and generate a slug if it does not exist.
+
+        Parameters
+        ----------
+        *args : tuple
+            The positional arguments.
+        **kwargs : dict
+            The keyword arguments.
+        """
+        if not self.slug:
+            self.slug = slugify(self.name)
+
+        super().save(*args, **kwargs)
 
 
 class ProductPriceHistory(models.Model):

@@ -10,12 +10,7 @@ app_name = "api"
 
 urlpatterns = [
     path(
-        "",
-        views.home,
-        name="home",
-    ),
-    path(
-        "health-check",
+        "health-check/",
         views.health_check,
         name="health-check",
     ),

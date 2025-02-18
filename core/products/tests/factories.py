@@ -16,7 +16,8 @@ class ProductUnitFactory(factory.django.DjangoModelFactory):
         model = ProductUnit
 
     name = factory.LazyAttribute(lambda _: fake.word()[:10])
-    symbol = factory.LazyAttribute(lambda _: fake.word()[:10])
+
+    symbol = factory.Sequence(lambda n: f"{fake.word()[:10]}_{n}")
 
 
 class ProductCategoryFactory(factory.django.DjangoModelFactory):
