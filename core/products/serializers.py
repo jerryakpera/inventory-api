@@ -23,6 +23,9 @@ class ProductCategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductCategory
         fields = "__all__"
+        extra_kwargs = {
+            "slug": {"required": False},
+        }
 
 
 class ProductSerializer(serializers.ModelSerializer):

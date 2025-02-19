@@ -17,4 +17,12 @@ urlpatterns = [
         "",
         views.ProductMixinView.as_view(),
     ),
+    path(
+        "categories/<int:pk>/",
+        views.ProductCategoryMixinView.as_view(),
+    ),
+    path(
+        "categories/",
+        views.ProductCategoryMixinView.as_view(),
+    ),
 ]

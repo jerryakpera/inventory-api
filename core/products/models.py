@@ -44,7 +44,7 @@ class ProductCategory(models.Model):
     slug = models.SlugField(unique=True, max_length=250)
 
     class Meta:
-        ordering = ["name"]
+        ordering = ["id", "name"]
         verbose_name_plural = "Product categories"
 
     def __str__(self):
