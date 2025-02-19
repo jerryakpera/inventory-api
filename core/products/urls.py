@@ -33,4 +33,12 @@ urlpatterns = [
         "units/",
         views.ProductUnitMixinView.as_view(),
     ),
+    path(
+        "variants/<int:pk>/",
+        views.ProductVariantMixinView.as_view(),
+    ),
+    path(
+        "variants/",
+        views.ProductVariantMixinView.as_view(),
+    ),
 ]

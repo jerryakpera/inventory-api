@@ -82,18 +82,45 @@ class ProductUnitSerializer(serializers.ModelSerializer):
 class ProductVariantSerializer(serializers.ModelSerializer):
     """
     Serializer for the ProductVariant model.
+    Merges necessary details from the Product model.
     """
 
-    unit = serializers.CharField(source="product.unit.symbol", read_only=True)
+    name = serializers.CharField(
+        source="product.name",
+        read_only=True,
+    )
+    description = serializers.CharField(
+        source="product.description",
+        read_only=True,
+    )
+    category = serializers.CharField(
+        source="product.category.name",
+        read_only=True,
+    )
+    unit = serializers.CharField(
+        source="product.unit.name",
+        read_only=True,
+    )
+
+    # size = serializers.DecimalField(
+    #     max_digits=10,
+    #     decimal_places=2,
+    #     coerce_to_string=False,
+    # )
+    # price = serializers.DecimalField(
+    #     max_digits=10,
+    #     decimal_places=2,
+    #     coerce_to_string=False,
+    # )
+
+    product = serializers.PrimaryKeyRelatedField(
+        queryset=Product.objects.all(),
+        required=True,
+    )
 
     class Meta:
         model = ProductVariant
-        fields = [
-            "product",
-            "id",
-            "unit",
-            "price",
-            "created",
-            "updated",
-            "readable_name",
-        ]
+        fields = "__all__"
+        extra_kwargs = {
+            "slug": {"required": False},
+        }

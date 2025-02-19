@@ -320,3 +320,121 @@ class ProductUnitMixinView(
             The response object.
         """
         return self.destroy(request, *args, **kwargs)
+
+
+class ProductVariantMixinView(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.RetrieveModelMixin,
+    generics.GenericAPIView,
+):
+    """
+    A view for the `ProductVariant` model that supports all CRUD operations.
+    """
+
+    lookup_field = "pk"
+    queryset = product_models.ProductVariant.objects.all()
+    serializer_class = product_serializers.ProductVariantSerializer
+
+    def perform_create(self, serializer):
+        """
+        Override perform_create to set a default author if not provided.
+
+        Parameters
+        ----------
+        serializer : rest_framework.serializers.ModelSerializer
+            The serializer instance.
+        """
+        if not serializer.validated_data.get("author"):
+            serializer.save(author_id=1)
+        else:
+            serializer.save()
+
+    def get(self, request, *args, **kwargs):
+        """
+        Handle GET requests.
+
+        Parameters
+        ----------
+        request : rest_framework.request.Request
+            The request object.
+        *args : list
+            Additional positional arguments.
+        **kwargs : dict
+            Additional keyword arguments.
+
+        Returns
+        -------
+        rest_framework.response.Response
+            The response object.
+        """
+        pk = kwargs.get("pk")
+
+        if pk:
+            return self.retrieve(request, *args, **kwargs)
+
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests.
+
+        Parameters
+        ----------
+        request : rest_framework.request.Request
+            The request object.
+        *args : list
+            Additional positional arguments.
+        **kwargs : dict
+            Additional keyword arguments.
+
+        Returns
+        -------
+        rest_framework.response.Response
+            The response object.
+        """
+
+        return self.create(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        """
+        Handle PUT requests.
+
+        Parameters
+        ----------
+        request : rest_framework.request.Request
+            The request object.
+        *args : list
+            Additional positional arguments.
+        **kwargs : dict
+            Additional keyword arguments.
+
+        Returns
+        -------
+        rest_framework.response.Response
+            The response object.
+        """
+
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Handle DELETE requests.
+
+        Parameters
+        ----------
+        request : rest_framework.request.Request
+            The request object.
+        *args : list
+            Additional positional arguments.
+        **kwargs : dict
+            Additional keyword arguments.
+
+        Returns
+        -------
+        rest_framework.response.Response
+            The response object.
+        """
+        return self.destroy(request, *args, **kwargs)

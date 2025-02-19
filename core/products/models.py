@@ -199,8 +199,10 @@ class ProductVariant(models.Model):
 
     description = models.TextField(null=True, blank=True)
 
-    size = models.PositiveIntegerField(
-        default=0,
+    size = models.DecimalField(
+        default=0.0,
+        max_digits=10,
+        decimal_places=2,
         help_text="The size of the product.",
     )
     flavor = models.CharField(
@@ -219,6 +221,12 @@ class ProductVariant(models.Model):
             "The minimum stock level at which the product "
             "is considered to be low in stock."
         ),
+    )
+
+    # The product is considered active if it can be ordered
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Is this product available for purchase?",
     )
 
     updated = models.DateTimeField(auto_now=True, editable=False)
