@@ -2,10 +2,11 @@
 This file is used to define the models for the products app.
 """
 
-from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.db.models import CheckConstraint, Q
 from django.utils.text import slugify
+from simple_history.models import HistoricalRecords
 from taggit.managers import TaggableManager
 
 from core.custom_user.models import User
@@ -38,8 +39,9 @@ class ProductCategory(models.Model):
 
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True)
+
     image = models.ImageField(
-        upload_to=f"{settings.AWS_PROJECT_FOLDER}/product_categories/",
+        upload_to="categories/",
         null=True,
         blank=True,
         help_text="An image of the category.",
@@ -117,7 +119,7 @@ class Product(models.Model):
     )
 
     image = models.ImageField(
-        upload_to=f"{settings.AWS_PROJECT_FOLDER}/products/",
+        upload_to="products/",
         null=True,
         blank=True,
         help_text="An image of the product.",
@@ -131,6 +133,8 @@ class Product(models.Model):
 
     updated = models.DateTimeField(auto_now=True, editable=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)
+
+    history = HistoricalRecords()
 
     def __str__(self):
         """
@@ -203,7 +207,8 @@ class ProductVariant(models.Model):
     sku = models.CharField(
         max_length=30,
         unique=True,
-        # editable=False,
+        editable=False,
+        db_index=True,
         help_text="Stock Keeping Unit for inventory tracking.",
     )
 
@@ -217,6 +222,8 @@ class ProductVariant(models.Model):
         on_delete=models.CASCADE,
         related_name="variants",
     )
+
+    brand = models.CharField(max_length=100, blank=True, null=True)
 
     description = models.TextField(null=True, blank=True)
 
@@ -248,29 +255,63 @@ class ProductVariant(models.Model):
     # The product is considered active if it can be ordered
     is_active = models.BooleanField(
         default=True,
+        db_index=True,
         help_text="Is this product available for purchase?",
+    )
+    is_deleted = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text="Has this product been deleted?",
     )
 
     updated = models.DateTimeField(auto_now=True, editable=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)
 
-    slug = models.SlugField(unique=True, max_length=250, editable=False)
+    slug = models.SlugField(
+        unique=True,
+        max_length=250,
+        editable=False,
+        db_index=True,
+    )
 
     image = models.ImageField(
-        upload_to=f"{settings.AWS_PROJECT_FOLDER}/product_variants/",
+        upload_to="variants/",
         null=True,
         blank=True,
-        help_text="An image of the product variant.",
+        help_text="An image of the category.",
     )
+
+    history = HistoricalRecords()
 
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=["product", "size", "flavor"],
+                fields=["product", "brand", "size", "flavor"],
                 name="unique_product_variant",
                 condition=~models.Q(flavor=None),
-            )
+            ),
+            CheckConstraint(check=Q(size__gte=0), name="size_non_negative"),
         ]
+
+        indexes = [
+            models.Index(fields=["slug"]),
+            models.Index(fields=["sku"]),
+            models.Index(fields=["is_active"]),
+        ]
+
+    def delete(self, *args, **kwargs):
+        """
+        Delete the product variant and set the `is_deleted` flag to `True`.
+
+        Parameters
+        ----------
+        *args : tuple
+            The positional arguments.
+        **kwargs : dict
+            The keyword arguments.
+        """
+        self.is_deleted = True
+        self.save()
 
     def readable_name(self):
         """
@@ -294,6 +335,9 @@ class ProductVariant(models.Model):
         """
         details = []
 
+        if self.brand:
+            details.append(self.brand)
+
         if self.size:
             details.append(f"{self.size}{self.product.unit.symbol}")
 
@@ -312,10 +356,11 @@ class ProductVariant(models.Model):
             The generated SKU.
         """
         base_sku = slugify(self.product.name)[:6].upper()
+        brand_part = f"{self.brand}" if self.brand else "NA"
         size_part = f"{int(self.size)}" if self.size else "NA"
         flavor_part = slugify(self.flavor)[:3].upper() if self.flavor else "NA"
 
-        return f"{base_sku}-{size_part}-{flavor_part}"
+        return f"{base_sku}-{brand_part}-{size_part}-{flavor_part}"
 
     def save(self, *args, **kwargs):
         """

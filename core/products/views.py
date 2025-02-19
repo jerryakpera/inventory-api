@@ -2,9 +2,7 @@
 Views for the `products` app.
 """
 
-from rest_framework import generics, mixins
-
-from core.api.utils import log_this
+from rest_framework import authentication, generics, mixins, permissions
 
 from . import models as product_models
 from . import serializers as product_serializers
@@ -25,6 +23,9 @@ class ProductMixinView(
     lookup_field = "pk"
     queryset = product_models.Product.objects.all()
     serializer_class = product_serializers.ProductSerializer
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    authentication_classes = [authentication.SessionAuthentication]
 
     def get(self, request, *args, **kwargs):
         """

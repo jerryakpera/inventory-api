@@ -147,6 +147,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         model = ProductVariant
         fields = "__all__"
         extra_kwargs = {
+            "sku": {"required": False},
             "slug": {"required": False},
             "flavor": {"required": False},
         }
@@ -160,9 +161,5 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductVariant
         fields = "__all__"
-        extra_kwargs = {
-            "slug": {"required": False},
-            "flavor": {"required": False},
-        }
 
         depth = 2
