@@ -41,4 +41,12 @@ urlpatterns = [
         "variants/",
         views.ProductVariantMixinView.as_view(),
     ),
+    path(
+        "price-history/<int:pk>/",
+        views.ProductPriceHistoryMixinView.as_view(),
+    ),
+    path(
+        "price-history/",
+        views.ProductPriceHistoryMixinView.as_view(),
+    ),
 ]

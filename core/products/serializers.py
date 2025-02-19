@@ -138,17 +138,6 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
-    # size = serializers.DecimalField(
-    #     max_digits=10,
-    #     decimal_places=2,
-    #     coerce_to_string=False,
-    # )
-    # price = serializers.DecimalField(
-    #     max_digits=10,
-    #     decimal_places=2,
-    #     coerce_to_string=False,
-    # )
-
     product = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.all(),
         required=True,
@@ -161,3 +150,19 @@ class ProductVariantSerializer(serializers.ModelSerializer):
             "slug": {"required": False},
             "flavor": {"required": False},
         }
+
+
+class ProductVariantDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the ProductVariant model.
+    """
+
+    class Meta:
+        model = ProductVariant
+        fields = "__all__"
+        extra_kwargs = {
+            "slug": {"required": False},
+            "flavor": {"required": False},
+        }
+
+        depth = 2

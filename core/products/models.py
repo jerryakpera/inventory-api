@@ -2,6 +2,7 @@
 This file is used to define the models for the products app.
 """
 
+from django.conf import settings
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.text import slugify
@@ -37,6 +38,12 @@ class ProductCategory(models.Model):
 
     name = models.CharField(max_length=50, unique=True)
     description = models.TextField(blank=True)
+    image = models.ImageField(
+        upload_to=f"{settings.AWS_PROJECT_FOLDER}/product_categories/",
+        null=True,
+        blank=True,
+        help_text="An image of the category.",
+    )
 
     updated = models.DateTimeField(auto_now=True, editable=False)
     created = models.DateTimeField(auto_now_add=True, editable=False)
@@ -107,6 +114,13 @@ class Product(models.Model):
         ProductUnit,
         on_delete=models.CASCADE,
         related_name="products",
+    )
+
+    image = models.ImageField(
+        upload_to=f"{settings.AWS_PROJECT_FOLDER}/products/",
+        null=True,
+        blank=True,
+        help_text="An image of the product.",
     )
 
     # The product is considered active if it can be ordered
@@ -236,10 +250,10 @@ class ProductVariant(models.Model):
     slug = models.SlugField(unique=True, max_length=250, editable=False)
 
     image = models.ImageField(
-        upload_to="product_variants/",
+        upload_to=f"{settings.AWS_PROJECT_FOLDER}/product_variants/",
         null=True,
         blank=True,
-        help_text="An image of the product.",
+        help_text="An image of the product variant.",
     )
 
     class Meta:
