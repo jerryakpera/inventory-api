@@ -200,6 +200,13 @@ class ProductVariant(models.Model):
     Represents a variant of a product with specific attributes like size and flavor.
     """
 
+    sku = models.CharField(
+        max_length=30,
+        unique=True,
+        # editable=False,
+        help_text="Stock Keeping Unit for inventory tracking.",
+    )
+
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -295,9 +302,24 @@ class ProductVariant(models.Model):
 
         return f"{self.product.name} ({', '.join(details)})"
 
+    def generate_sku(self):
+        """
+        Generate a unique SKU based on product attributes.
+
+        Returns
+        -------
+        str
+            The generated SKU.
+        """
+        base_sku = slugify(self.product.name)[:6].upper()
+        size_part = f"{int(self.size)}" if self.size else "NA"
+        flavor_part = slugify(self.flavor)[:3].upper() if self.flavor else "NA"
+
+        return f"{base_sku}-{size_part}-{flavor_part}"
+
     def save(self, *args, **kwargs):
         """
-        Save the product variant and generate a slug if it does not exist.
+        Save the product variant and generate an SKU if it does not exist.
         Track price changes and store them in `ProductPriceHistory`.
 
         Parameters
@@ -307,6 +329,15 @@ class ProductVariant(models.Model):
         **kwargs : dict
             The keyword arguments.
         """
+        if not self.sku:
+            self.sku = self.generate_sku()
+
+            # Ensure SKU is unique
+            counter = 1
+            while ProductVariant.objects.filter(sku=self.sku).exists():
+                self.sku = f"{self.generate_sku()}-{counter}"
+                counter += 1
+
         if not self.slug:
             slug_base = f"{self.product.name}-{self.size or ''}-{self.flavor or ''}"
             self.slug = slugify(slug_base)
