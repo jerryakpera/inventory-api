@@ -93,13 +93,14 @@ class Product(models.Model):
         on_delete=models.CASCADE,
         related_name="products",
         null=True,
+        blank=True,
     )
 
     tags = TaggableManager(
         help_text="Use tags to add health benefits, Hair growth, etc.",
     )
 
-    description = models.TextField()
+    description = models.TextField(null=True, blank=True)
     slug = models.SlugField(unique=True, max_length=250)
 
     unit = models.ForeignKey(

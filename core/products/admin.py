@@ -49,7 +49,7 @@ class ProductAdmin(admin.ModelAdmin):
         """
         return ", ".join(obj.tags.names())
 
-    raw_id_fields = ["author"]
+    raw_id_fields = ["author", "unit"]
     date_hierarchy = "created"
     ordering = ["name", "category"]
     list_filter = ("category", "unit")

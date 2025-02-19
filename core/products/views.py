@@ -2,71 +2,113 @@
 Views for the `products` app.
 """
 
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+from rest_framework import generics, mixins
+
+from core.api.utils import log_this
 
 from . import models as product_models
 from . import serializers as product_serializers
 
 
-@api_view(["GET"])
-def list_products(request):
+class ProductMixinView(
+    mixins.ListModelMixin,
+    mixins.CreateModelMixin,
+    mixins.UpdateModelMixin,
+    mixins.DestroyModelMixin,
+    mixins.RetrieveModelMixin,
+    generics.GenericAPIView,
+):
     """
-    DRF View for listing products.
-
-    Parameters
-    ----------
-    request : HttpRequest
-        The request object.
-
-    Returns
-    -------
-    HttpResponse
-        The response object.
-    """
-    return Response(
-        {"message": "Listing products"},
-        status=status.HTTP_200_OK,
-    )
-
-
-@api_view(["GET"])
-def get_product(request, product_id):
-    """
-    DRF View for getting a product.
-
-    Parameters
-    ----------
-    request : HttpRequest
-        The request object.
-    product_id : int
-        The ID of the product.
-
-    Returns
-    -------
-    HttpResponse
-        The response object.
+    A view for the `Product` model that supports all CRUD operations.
     """
 
-    try:
-        instance = product_models.ProductVariant.objects.get(pk=product_id)
-    except product_models.ProductVariant.DoesNotExist:
-        return Response(
-            {
-                "data": {},
-                "message": "Product not found",
-            },
-            status=status.HTTP_404_NOT_FOUND,
-        )
+    lookup_field = "pk"
+    queryset = product_models.Product.objects.all()
+    serializer_class = product_serializers.ProductSerializer
 
-    serializer = product_serializers.ProductVariantSerializer(instance)
-    data = serializer.data
+    def get(self, request, *args, **kwargs):
+        """
+        Handle GET requests.
 
-    return Response(
-        {
-            "data": data,
-            "message": "Product retrieved successfully",
-        },
-        status=status.HTTP_200_OK,
-    )
+        Parameters
+        ----------
+        request : rest_framework.request.Request
+            The request object.
+        *args : list
+            Additional positional arguments.
+        **kwargs : dict
+            Additional keyword arguments.
+
+        Returns
+        -------
+        rest_framework.response.Response
+            The response object.
+        """
+        pk = kwargs.get("pk")
+
+        if pk:
+            return self.retrieve(request, *args, **kwargs)
+
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        """
+        Handle POST requests.
+
+        Parameters
+        ----------
+        request : rest_framework.request.Request
+            The request object.
+        *args : list
+            Additional positional arguments.
+        **kwargs : dict
+            Additional keyword arguments.
+
+        Returns
+        -------
+        rest_framework.response.Response
+            The response object.
+        """
+
+        return self.create(request, *args, **kwargs)
+
+    def put(self, request, *args, **kwargs):
+        """
+        Handle PUT requests.
+
+        Parameters
+        ----------
+        request : rest_framework.request.Request
+            The request object.
+        *args : list
+            Additional positional arguments.
+        **kwargs : dict
+            Additional keyword arguments.
+
+        Returns
+        -------
+        rest_framework.response.Response
+            The response object.
+        """
+
+        return self.update(request, *args, **kwargs)
+
+    def delete(self, request, *args, **kwargs):
+        """
+        Handle DELETE requests.
+
+        Parameters
+        ----------
+        request : rest_framework.request.Request
+            The request object.
+        *args : list
+            Additional positional arguments.
+        **kwargs : dict
+            Additional keyword arguments.
+
+        Returns
+        -------
+        rest_framework.response.Response
+            The response object.
+        """
+        return self.destroy(request, *args, **kwargs)

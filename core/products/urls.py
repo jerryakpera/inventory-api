@@ -10,13 +10,11 @@ app_name = "products"
 
 urlpatterns = [
     path(
-        "",
-        views.list_products,
-        name="list-products",
+        "<int:pk>/",
+        views.ProductMixinView.as_view(),
     ),
     path(
-        "<int:product_id>/",
-        views.get_product,
-        name="get-product",
+        "",
+        views.ProductMixinView.as_view(),
     ),
 ]
