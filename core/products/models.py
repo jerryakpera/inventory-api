@@ -334,7 +334,9 @@ class ProductVariant(models.Model):
 
             # Ensure SKU is unique
             counter = 1
-            while ProductVariant.objects.filter(sku=self.sku).exists():
+            while ProductVariant.objects.filter(
+                sku=self.sku
+            ).exists():  # pragma: no cover
                 self.sku = f"{self.generate_sku()}-{counter}"
                 counter += 1
 

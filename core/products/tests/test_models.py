@@ -79,6 +79,12 @@ class TestProductVariantModel(TestCase):
         """Test the readable_name method of ProductVariant."""
         self.assertEqual(self.variant.readable_name(), "Apple (10g, Green)")
 
+    def test_sku_generation(self):
+        self.assertIsNotNone(self.variant.sku)
+        self.assertTrue(
+            self.variant.sku.startswith(self.variant.generate_sku()),
+        )
+
     def test_slug_generation(self):
         self.assertEqual(self.variant.slug, "apple-10-green")
 
