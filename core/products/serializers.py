@@ -20,6 +20,24 @@ class ProductCategorySerializer(serializers.ModelSerializer):
     Serializer for the ProductCategory model.
     """
 
+    product_count = serializers.SerializerMethodField()
+
+    def get_product_count(self, obj):
+        """
+        Return the number of products associated with this category.
+
+        Parameters
+        ----------
+        obj : ProductCategory
+            The product category instance.
+
+        Returns
+        -------
+        int
+            The number of products associated with this category.
+        """
+        return obj.products.count()
+
     class Meta:
         model = ProductCategory
         fields = "__all__"
@@ -47,6 +65,24 @@ class ProductSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(),
         required=False,
     )
+
+    variant_count = serializers.SerializerMethodField()
+
+    def get_variant_count(self, obj):
+        """
+        Return the number of product variants associated with this product.
+
+        Parameters
+        ----------
+        obj : Product
+            The product instance.
+
+        Returns
+        -------
+        int
+            The number of product variants associated with this product.
+        """
+        return obj.variants.count()
 
     class Meta:
         model = Product
@@ -123,4 +159,5 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         fields = "__all__"
         extra_kwargs = {
             "slug": {"required": False},
+            "flavor": {"required": False},
         }

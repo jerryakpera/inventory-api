@@ -209,6 +209,7 @@ class ProductVariant(models.Model):
         max_length=50,
         blank=True,
         null=True,
+        default="",
     )
     price = models.DecimalField(
         max_digits=10,
@@ -242,8 +243,13 @@ class ProductVariant(models.Model):
     )
 
     class Meta:
-        # A product variant is unique by product, size, and flavor
-        unique_together = ("product", "size", "flavor")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["product", "size", "flavor"],
+                name="unique_product_variant",
+                condition=~models.Q(flavor=None),
+            )
+        ]
 
     def readable_name(self):
         """
