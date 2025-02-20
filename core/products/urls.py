@@ -2,51 +2,21 @@
 URL configuration for the products app in the inventory API.
 """
 
-from django.urls import path
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 
 from . import views
 
 app_name = "products"
 
+router = DefaultRouter()
+
+router.register(r"products", views.ProductViewSet)
+router.register(r"units", views.ProductUnitViewSet)
+router.register(r"variants", views.ProductVariantViewSet)
+router.register(r"categories", views.ProductCategoryViewSet)
+router.register(r"price-histories", views.ProductPriceHistoryViewSet)
+
 urlpatterns = [
-    path(
-        "<int:pk>/",
-        views.ProductMixinView.as_view(),
-    ),
-    path(
-        "",
-        views.ProductMixinView.as_view(),
-    ),
-    path(
-        "categories/<int:pk>/",
-        views.ProductCategoryMixinView.as_view(),
-    ),
-    path(
-        "categories/",
-        views.ProductCategoryMixinView.as_view(),
-    ),
-    path(
-        "units/<int:pk>/",
-        views.ProductUnitMixinView.as_view(),
-    ),
-    path(
-        "units/",
-        views.ProductUnitMixinView.as_view(),
-    ),
-    path(
-        "variants/<int:pk>/",
-        views.ProductVariantMixinView.as_view(),
-    ),
-    path(
-        "variants/",
-        views.ProductVariantMixinView.as_view(),
-    ),
-    path(
-        "price-history/<int:pk>/",
-        views.ProductPriceHistoryMixinView.as_view(),
-    ),
-    path(
-        "price-history/",
-        views.ProductPriceHistoryMixinView.as_view(),
-    ),
+    path("", include(router.urls)),
 ]

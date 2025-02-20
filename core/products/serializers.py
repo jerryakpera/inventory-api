@@ -5,6 +5,7 @@ Serializers for the products app.
 from rest_framework import serializers
 
 from core.custom_user.models import User
+from core.custom_user.serializers import UserSerializer
 
 from .models import (
     Product,
@@ -13,6 +14,16 @@ from .models import (
     ProductUnit,
     ProductVariant,
 )
+
+
+class ProductUnitSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the ProductUnit model.
+    """
+
+    class Meta:
+        model = ProductUnit
+        fields = "__all__"
 
 
 class ProductCategorySerializer(serializers.ModelSerializer):
@@ -51,38 +62,29 @@ class ProductSerializer(serializers.ModelSerializer):
     Serializer for the Product model.
     """
 
-    category = serializers.PrimaryKeyRelatedField(
-        queryset=ProductCategory.objects.all(),
-        required=False,
-    )
+    author = UserSerializer(read_only=True)
+    unit = ProductUnitSerializer(read_only=True)
+    category = ProductCategorySerializer(read_only=True)
 
-    unit = serializers.PrimaryKeyRelatedField(
-        queryset=ProductUnit.objects.all(),
-        required=False,
-    )
+    variant_count = serializers.IntegerField(read_only=True)
 
-    author = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
-        required=False,
-    )
-
-    variant_count = serializers.SerializerMethodField()
-
-    def get_variant_count(self, obj):
+    def to_representation(self, instance):
         """
-        Return the number of product variants associated with this product.
+        Add the number of variants associated with the product.
 
         Parameters
         ----------
-        obj : Product
+        instance : Product
             The product instance.
 
         Returns
         -------
-        int
-            The number of product variants associated with this product.
+        dict
+            The serialized product instance.
         """
-        return obj.variants.count()
+        instance.variant_count = instance.variants.count()
+
+        return super().to_representation(instance)
 
     class Meta:
         model = Product
@@ -92,7 +94,6 @@ class ProductSerializer(serializers.ModelSerializer):
             "author": {"required": False},
             "is_active": {"required": True},
         }
-        depth = 1
 
 
 class ProductPriceHistorySerializer(serializers.ModelSerializer):
@@ -102,16 +103,6 @@ class ProductPriceHistorySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductPriceHistory
-        fields = "__all__"
-
-
-class ProductUnitSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the ProductUnit model.
-    """
-
-    class Meta:
-        model = ProductUnit
         fields = "__all__"
 
 

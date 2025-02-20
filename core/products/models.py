@@ -2,6 +2,8 @@
 This file is used to define the models for the products app.
 """
 
+from decimal import Decimal
+
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import CheckConstraint, Q
@@ -179,7 +181,7 @@ class ProductPriceHistory(models.Model):
         max_digits=10,
         decimal_places=2,
         validators=[
-            MinValueValidator(0),
+            MinValueValidator(Decimal("0")),
         ],
     )
     timestamp = models.DateTimeField(auto_now_add=True)
