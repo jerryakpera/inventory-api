@@ -62,9 +62,11 @@ class ProductSerializer(serializers.ModelSerializer):
     Serializer for the Product model.
     """
 
-    author = UserSerializer(read_only=True)
-    unit = ProductUnitSerializer(read_only=True)
-    category = ProductCategorySerializer(read_only=True)
+    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    unit = serializers.PrimaryKeyRelatedField(queryset=ProductUnit.objects.all())
+    category = serializers.PrimaryKeyRelatedField(
+        queryset=ProductCategory.objects.all()
+    )
 
     variant_count = serializers.IntegerField(read_only=True)
 
@@ -90,8 +92,7 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = "__all__"
         extra_kwargs = {
-            "slug": {"required": False},
-            "author": {"required": False},
+            "slug": {"required": False, "read_only": True},
             "is_active": {"required": True},
         }
 
