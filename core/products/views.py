@@ -26,6 +26,7 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
     ViewSet for the ProductCategory model.
     """
 
+    pagination_class = StandardPagination
     queryset = product_models.ProductCategory.objects.all()
     serializer_class = product_serializers.ProductCategorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -37,6 +38,7 @@ class ProductUnitViewSet(viewsets.ModelViewSet):
     ViewSet for the ProductUnit model.
     """
 
+    pagination_class = StandardPagination
     queryset = product_models.ProductUnit.objects.all()
     serializer_class = product_serializers.ProductUnitSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
@@ -60,6 +62,7 @@ class ProductPriceHistoryViewSet(viewsets.ModelViewSet):
     ViewSet for the ProductPriceHistory model.
     """
 
+    pagination_class = StandardPagination
     queryset = product_models.ProductPriceHistory.objects.all()
     serializer_class = product_serializers.ProductPriceHistorySerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
