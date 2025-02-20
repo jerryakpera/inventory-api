@@ -6,6 +6,7 @@ from rest_framework import authentication, permissions, viewsets
 
 from . import models as product_models
 from . import serializers as product_serializers
+from .pagination import StandardPagination
 
 
 class ProductViewSet(viewsets.ModelViewSet):
@@ -13,7 +14,8 @@ class ProductViewSet(viewsets.ModelViewSet):
     ViewSet for the Product model.
     """
 
-    queryset = product_models.Product.objects.all()
+    pagination_class = StandardPagination
+    queryset = product_models.Product.objects.all().order_by("id")
     serializer_class = product_serializers.ProductSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     authentication_classes = [authentication.SessionAuthentication]
@@ -46,7 +48,8 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
     ViewSet for the ProductVariant model.
     """
 
-    queryset = product_models.ProductVariant.objects.all()
+    pagination_class = StandardPagination
+    queryset = product_models.ProductVariant.objects.all().order_by("id")
     serializer_class = product_serializers.ProductVariantSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     authentication_classes = [authentication.SessionAuthentication]

@@ -244,7 +244,9 @@ class ProductVariant(models.Model):
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        validators=[MinValueValidator(0)],
+        validators=[
+            MinValueValidator(Decimal("0")),
+        ],
     )
     stock = models.PositiveIntegerField()
     low_stock_threshold = models.PositiveIntegerField(
