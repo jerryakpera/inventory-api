@@ -6,7 +6,6 @@ from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import CheckConstraint, Q
 from django.utils.text import slugify
 from simple_history.models import HistoricalRecords
 from taggit.managers import TaggableManager
@@ -288,13 +287,9 @@ class ProductVariant(models.Model):
     history = HistoricalRecords()
 
     class Meta:
-        constraints = [
-            models.UniqueConstraint(
-                fields=["product", "brand", "size", "flavor"],
-                name="unique_product_variant",
-                condition=~models.Q(flavor=None),
-            ),
-            CheckConstraint(check=Q(size__gte=0), name="size_non_negative"),
+        unique_together = [
+            ["product", "brand", "size", "flavor"],
+            ["product", "sku"],
         ]
 
         indexes = [
