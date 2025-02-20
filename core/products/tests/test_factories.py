@@ -64,6 +64,4 @@ class TestProductVariantFactory(TestCase):
         self.assertTrue(self.product_variant.author)
         self.assertTrue(self.product.description)
         self.assertTrue(self.product_variant.price)
-        self.assertTrue(self.product_variant.stock)
-        self.assertTrue(self.product_variant.low_stock_threshold)
         self.assertTrue(self.product_variant.size)

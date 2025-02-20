@@ -57,6 +57,4 @@ class ProductVariantFactory(factory.django.DjangoModelFactory):  # pragma: no co
         right_digits=2,
         positive=True,
     )
-    stock = factory.Faker("random_int", min=5, max=100)
-    low_stock_threshold = factory.Faker("random_int", min=1, max=10)
     flavor = factory.Faker("word")

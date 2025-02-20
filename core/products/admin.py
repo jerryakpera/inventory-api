@@ -66,7 +66,7 @@ class ProductVariantAdmin(admin.ModelAdmin):
     """
 
     raw_id_fields = ["product", "author"]
-    list_display = ("product", "price", "stock", "image")
+    list_display = ("product", "price", "image")
     list_filter = ("product",)
     search_fields = ("product__name",)
     ordering = [

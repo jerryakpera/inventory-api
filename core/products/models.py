@@ -247,13 +247,6 @@ class ProductVariant(models.Model):
             MinValueValidator(Decimal("0")),
         ],
     )
-    stock = models.PositiveIntegerField()
-    low_stock_threshold = models.PositiveIntegerField(
-        help_text=(
-            "The minimum stock level at which the product "
-            "is considered to be low in stock."
-        ),
-    )
 
     # The product is considered active if it can be ordered
     is_active = models.BooleanField(

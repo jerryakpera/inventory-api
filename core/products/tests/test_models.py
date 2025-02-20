@@ -23,7 +23,9 @@ class TestProductUnitModel(TestCase):
 class TestProductCategoryModel(TestCase):
     def setUp(self):
         self.category = ProductCategory.objects.create(
-            name="Fruits", description="A category of fruits.", slug="fruits"
+            name="Fruits",
+            description="A category of fruits.",
+            slug="fruits",
         )
 
     def test_string_representation(self):
@@ -40,7 +42,10 @@ class TestProductModel(TestCase):
         self.category = ProductCategory.objects.create(name="Fruits", slug="fruits")
         self.author = UserFactory()
         self.product = Product.objects.create(
-            author=self.author, name="Apple", category=self.category, unit=self.unit
+            author=self.author,
+            name="Apple",
+            category=self.category,
+            unit=self.unit,
         )
 
     def test_string_representation(self):
@@ -48,7 +53,9 @@ class TestProductModel(TestCase):
 
     def test_slug_generation(self):
         product = Product.objects.create(
-            author=self.author, name="Banana", unit=self.unit
+            author=self.author,
+            name="Banana",
+            unit=self.unit,
         )
         self.assertEqual(product.slug, "banana")
 
@@ -56,28 +63,37 @@ class TestProductModel(TestCase):
 class TestProductVariantModel(TestCase):
     def setUp(self):
         self.unit = ProductUnit.objects.create(name="Gram", symbol="g")
-        self.category = ProductCategory.objects.create(name="Fruits", slug="fruits")
+        self.category = ProductCategory.objects.create(
+            name="Fruits",
+            slug="fruits",
+        )
         self.author = UserFactory()
         self.product = Product.objects.create(
-            author=self.author, name="Apple", category=self.category, unit=self.unit
+            author=self.author,
+            name="Apple",
+            category=self.category,
+            unit=self.unit,
         )
         self.variant = ProductVariant.objects.create(
             author=self.author,
             product=self.product,
             description="A green apple.",
             price=1.99,
+            brand="Apple Inc.",
             size=10,
-            stock=100,
             flavor="Green",
-            low_stock_threshold=10,
         )
 
     def test_string_representation(self):
-        self.assertEqual(str(self.variant), "Apple (10g, Green)")
+        self.assertEqual(str(self.variant), "Apple (Apple Inc., 10g, Green)")
+        # self.assertEqual(str(self.variant), "Apple (10g, Green)")
 
     def test_readable_name(self):
         """Test the readable_name method of ProductVariant."""
-        self.assertEqual(self.variant.readable_name(), "Apple (10g, Green)")
+        self.assertEqual(
+            self.variant.readable_name(),
+            "Apple (Apple Inc., 10g, Green)",
+        )
 
     def test_sku_generation(self):
         self.assertIsNotNone(self.variant.sku)
@@ -98,19 +114,34 @@ class TestProductVariantModel(TestCase):
         )
 
         self.assertTrue(price_history.exists())
-        self.assertEqual(price_history.first().price, Decimal(str(old_price)))
+        self.assertEqual(
+            price_history.first().price,
+            Decimal(str(old_price)),
+        )
+
+    def test_delete_product(self):
+        self.variant.delete()
+
+        self.assertEqual(self.variant.is_deleted, True)
+        self.assertTrue(ProductVariant.objects.filter(id=self.variant.id).exists())
 
 
 class TestProductPriceHistoryModel(TestCase):
     def setUp(self):
-        self.unit = ProductUnit.objects.create(name="Gram", symbol="g")
+        self.unit = ProductUnit.objects.create(
+            name="Gram",
+            symbol="g",
+        )
         self.category = ProductCategory.objects.create(
             name="Fruits",
             slug="fruits",
         )
         self.author = UserFactory()
         self.product = Product.objects.create(
-            author=self.author, name="Apple", category=self.category, unit=self.unit
+            author=self.author,
+            name="Apple",
+            category=self.category,
+            unit=self.unit,
         )
         self.variant = ProductVariant.objects.create(
             author=self.author,
@@ -118,9 +149,7 @@ class TestProductPriceHistoryModel(TestCase):
             description="A green apple.",
             price=Decimal("1.99"),
             size=Decimal("10"),
-            stock=100,
             flavor="Green",
-            low_stock_threshold=10,
         )
         self.price_history = ProductPriceHistory.objects.create(
             product_variant=self.variant,
