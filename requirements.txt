@@ -24,6 +24,7 @@ django==5.1.1
     #   django-taggit
     #   django-use-email-as-username
     #   djangorestframework
+    #   djangorestframework-simplejwt
 django-simple-history==3.8.0
     # via -r requirements.in
 django-storages==1.14.5
@@ -33,6 +34,10 @@ django-taggit==6.1.0
 django-use-email-as-username==1.4.0
     # via -r requirements.in
 djangorestframework==3.15.2
+    # via
+    #   -r requirements.in
+    #   djangorestframework-simplejwt
+djangorestframework-simplejwt==5.4.0
     # via -r requirements.in
 faker==28.0.0
     # via -r requirements.in
@@ -46,6 +51,8 @@ pillow==10.4.0
     # via -r requirements.in
 psycopg2-binary==2.9.9
     # via -r requirements.in
+pyjwt==2.10.1
+    # via djangorestframework-simplejwt
 python-dateutil==2.9.0.post0
     # via
     #   botocore

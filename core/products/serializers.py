@@ -25,6 +25,11 @@ class ProductUnitSerializer(serializers.ModelSerializer):
         model = ProductUnit
         fields = "__all__"
 
+        extra_kwargs = {
+            "author": {"required": False},
+            "slug": {"required": False},
+        }
+
 
 class ProductCategorySerializer(serializers.ModelSerializer):
     """
@@ -54,6 +59,7 @@ class ProductCategorySerializer(serializers.ModelSerializer):
         fields = "__all__"
         extra_kwargs = {
             "slug": {"required": False},
+            "author": {"required": False},
         }
 
 
@@ -62,7 +68,11 @@ class ProductSerializer(serializers.ModelSerializer):
     Serializer for the Product model.
     """
 
-    author = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
+    author = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(),
+        required=False,
+        write_only=True,
+    )
     unit = serializers.PrimaryKeyRelatedField(queryset=ProductUnit.objects.all())
     category = serializers.PrimaryKeyRelatedField(
         queryset=ProductCategory.objects.all()
@@ -92,8 +102,9 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = "__all__"
         extra_kwargs = {
+            "author": {"required": False},
+            "is_active": {"required": False},
             "slug": {"required": False, "read_only": True},
-            "is_active": {"required": True},
         }
 
 
@@ -141,7 +152,7 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "sku": {"required": False},
             "slug": {"required": False},
-            "flavor": {"required": False},
+            "author": {"required": False},
         }
 
 
