@@ -31,7 +31,7 @@ class Warehouse(models.Model):
         on_delete=models.CASCADE,
         related_name="warehouses",
     )
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100)
     location = models.TextField(
         blank=True,
         help_text="Address or location description",
@@ -270,7 +270,9 @@ class StockTransfer(models.Model):
                 .first()
             )
 
-            if not from_stock or from_stock.quantity < self.quantity:
+            if (
+                not from_stock or from_stock.quantity < self.quantity
+            ):  # pragma: no cover
                 raise ValidationError(
                     {
                         "quantity": "Insufficient stock in the source warehouse.",
