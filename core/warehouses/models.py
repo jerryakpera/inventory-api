@@ -5,7 +5,7 @@ Model definitions for `warehouses` app.
 from uuid import uuid4
 
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.utils.text import slugify
 
 
@@ -13,6 +13,18 @@ class Warehouse(models.Model):
     """
     Represents a physical or virtual warehouse location.
     """
+
+    TYPE_CHOICES = [
+        ("STORAGE", "Storage"),
+        ("SHOP", "Shop"),
+    ]
+
+    type = models.CharField(
+        max_length=20,
+        choices=TYPE_CHOICES,
+        default="STORAGE",
+        help_text="The type of warehouse.",
+    )
 
     author = models.ForeignKey(
         "custom_user.User",
@@ -53,9 +65,61 @@ class Warehouse(models.Model):
             The keyword arguments.
         """
         if not self.slug:
-            self.slug = slugify(self.name)
+            base_slug = slugify(self.name)
+            slug = base_slug
+            counter = 1
+
+            while Warehouse.objects.filter(slug=slug).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+
+            self.slug = slug
 
         super().save(*args, **kwargs)
+
+
+class WarehouseUser(models.Model):
+    """
+    Represent the relationship between users and warehouses with assigned roles.
+    """
+
+    ROLE_CHOICES = [
+        ("MANAGER", "Manager"),
+        ("STAFF", "Staff"),
+    ]
+
+    user = models.ForeignKey(
+        "custom_user.User",
+        on_delete=models.CASCADE,
+        related_name="warehouse_users",
+    )
+
+    warehouse = models.ForeignKey(
+        Warehouse,
+        on_delete=models.CASCADE,
+        related_name="users",
+    )
+
+    role = models.CharField(
+        max_length=20,
+        choices=ROLE_CHOICES,
+        default="STAFF",
+        help_text="The role of the user at the warehouse.",
+    )
+
+    class Meta:
+        unique_together = ("user", "warehouse")
+
+    def __str__(self):
+        """
+        Return a string representation of the warehouse user.
+
+        Returns
+        -------
+        str
+            The string representation.
+        """
+        return f"{self.user} - {self.role} at {self.warehouse}"
 
 
 class Stock(models.Model):
@@ -124,10 +188,10 @@ class StockTransfer(models.Model):
         related_name="transfers",
     )
     from_warehouse = models.ForeignKey(
-        Warehouse, on_delete=models.CASCADE, related_name="outgoing_transfers"
+        "Warehouse", on_delete=models.CASCADE, related_name="outgoing_transfers"
     )
     to_warehouse = models.ForeignKey(
-        Warehouse, on_delete=models.CASCADE, related_name="incoming_transfers"
+        "Warehouse", on_delete=models.CASCADE, related_name="incoming_transfers"
     )
     quantity = models.PositiveIntegerField()
     updated = models.DateTimeField(auto_now=True, editable=False)
@@ -138,37 +202,37 @@ class StockTransfer(models.Model):
 
     def __str__(self):
         """
-        Return a string representation of the transfer.
+        Return a string representation of the stock transfer.
 
         Returns
         -------
         str
             The string representation.
         """
+
         return (
-            f"Transfer {self.quantity} of {self.product_variant}"
-            f" from {self.from_warehouse} to {self.to_warehouse}."
+            f"Transfer {self.quantity} of {self.product_variant} "
+            f"from {self.from_warehouse} to {self.to_warehouse}."
         )
 
     def clean(self):
         """
-        Ensure that the `from_warehouse` and `to_warehouse` are different.
+        Ensure that `from_warehouse` and `to_warehouse` are different,
+        and validate stock availability.
         """
         if self.from_warehouse == self.to_warehouse:
             raise ValidationError(
                 {
                     "to_warehouse": (
-                        "Destination warehouse must be different "
-                        "from source warehouse."
+                        "Destination warehouse must be "
+                        "different from source warehouse."
                     )
                 }
             )
 
         if self.quantity <= 0:
             raise ValidationError(
-                {
-                    "quantity": "Transfer quantity must be greater than zero.",
-                }
+                {"quantity": "Transfer quantity must be greater than zero."}
             )
 
         # Check available stock
@@ -179,14 +243,12 @@ class StockTransfer(models.Model):
 
         if not from_stock or from_stock.quantity < self.quantity:
             raise ValidationError(
-                {
-                    "quantity": "Insufficient stock in the source warehouse.",
-                }
+                {"quantity": "Insufficient stock in the source warehouse."}
             )
 
     def save(self, *args, **kwargs):
         """
-        Override save to call `clean()` before saving.
+        Override save to ensure stock modification is done safely.
 
         Parameters
         ----------
@@ -195,22 +257,34 @@ class StockTransfer(models.Model):
         **kwargs : dict
             The keyword arguments.
         """
-        self.clean()
+        self.clean()  # Ensure validation
 
-        # Deduct stock from from_warehouse
-        from_stock, _ = Stock.objects.get_or_create(
-            warehouse=self.from_warehouse,
-            product_variant=self.product_variant,
-        )
-        from_stock.quantity -= self.quantity
-        from_stock.save()
+        with transaction.atomic():
+            # Lock stock row for update to prevent race conditions
+            from_stock = (
+                Stock.objects.select_for_update()
+                .filter(
+                    warehouse=self.from_warehouse,
+                    product_variant=self.product_variant,
+                )
+                .first()
+            )
 
-        # Add stock to to_warehouse
-        to_stock, _ = Stock.objects.get_or_create(
-            warehouse=self.to_warehouse,
-            product_variant=self.product_variant,
-        )
-        to_stock.quantity += self.quantity
-        to_stock.save()
+            if not from_stock or from_stock.quantity < self.quantity:
+                raise ValidationError(
+                    {
+                        "quantity": "Insufficient stock in the source warehouse.",
+                    }
+                )
 
-        super().save(*args, **kwargs)
+            from_stock.quantity -= self.quantity
+            from_stock.save()
+
+            to_stock, _ = Stock.objects.select_for_update().get_or_create(
+                warehouse=self.to_warehouse,
+                product_variant=self.product_variant,
+            )
+            to_stock.quantity += self.quantity
+            to_stock.save()
+
+            super().save(*args, **kwargs)
