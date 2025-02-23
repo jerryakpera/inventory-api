@@ -119,3 +119,48 @@ class StockTransferViewSet(viewsets.ModelViewSet):
                     }
                 )
             raise ValidationError({"error": "An unexpected database error occurred."})
+
+
+class StockAuditViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for performing stock audits.
+    """
+
+    pagination_class = StandardPagination
+    queryset = warehouse_models.StockAudit.objects.all().order_by("id")
+    serializer_class = warehouse_serializers.StockAuditSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        JWTAuthentication,
+    ]
+
+
+class StockAlertViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for performing stock audits.
+    """
+
+    pagination_class = StandardPagination
+    queryset = warehouse_models.StockAlert.objects.all().order_by("id")
+    serializer_class = warehouse_serializers.StockAlertSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        JWTAuthentication,
+    ]
+
+
+class StockAdjustmentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for performing stock audits.
+    """
+
+    pagination_class = StandardPagination
+    queryset = warehouse_models.StockAdjustment.objects.all().order_by("id")
+    serializer_class = warehouse_serializers.StockAdjustmentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [
+        authentication.SessionAuthentication,
+        JWTAuthentication,
+    ]

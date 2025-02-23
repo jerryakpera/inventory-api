@@ -7,7 +7,15 @@ from rest_framework import serializers
 from core.custom_user.models import User
 from core.products.models import ProductVariant
 
-from .models import Stock, StockTransfer, Warehouse, WarehouseUser
+from .models import (
+    Stock,
+    StockAdjustment,
+    StockAlert,
+    StockAudit,
+    StockTransfer,
+    Warehouse,
+    WarehouseUser,
+)
 
 
 class WarehouseSerializer(serializers.ModelSerializer):
@@ -122,3 +130,33 @@ class StockTransferSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             "reference_code": {"read_only": True},
         }
+
+
+class StockAlertSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the StockAlert model.
+    """
+
+    class Meta:
+        model = StockAlert
+        fields = "__all__"
+
+
+class StockAuditSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the StockAudit model.
+    """
+
+    class Meta:
+        model = StockAudit
+        fields = "__all__"
+
+
+class StockAdjustmentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the StockAdjustment model.
+    """
+
+    class Meta:
+        model = StockAdjustment
+        fields = "__all__"

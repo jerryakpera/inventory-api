@@ -455,7 +455,11 @@ class StockAdjustment(models.Model):
     adjustment_quantity = models.IntegerField(
         help_text="Positive to add stock, negative to reduce stock.",
     )
-    reason = models.CharField(max_length=50, choices=REASON_CHOICES)
+    reason = models.CharField(
+        max_length=50,
+        choices=REASON_CHOICES,
+        default="LOSS",
+    )
     created_by = models.ForeignKey(
         User,
         on_delete=models.CASCADE,

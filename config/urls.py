@@ -23,6 +23,9 @@ router.register(r"price-histories", product_views.ProductPriceHistoryViewSet)
 router.register(r"warehouses", warehouse_views.WarehouseViewSet)
 router.register(r"stocks", warehouse_views.StockViewSet)
 router.register(r"stock-transfers", warehouse_views.StockTransferViewSet)
+router.register(r"stock-adjustments", warehouse_views.StockAdjustmentViewSet)
+router.register(r"stock-audits", warehouse_views.StockAuditViewSet)
+router.register(r"stock-alert", warehouse_views.StockAlertViewSet)
 
 
 urlpatterns = [
