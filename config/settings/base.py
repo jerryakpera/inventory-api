@@ -52,6 +52,8 @@ THIRD_PARTY_APPS = [
     "storages",
     "rest_framework",
     "simple_history",
+    "django_celery_results",
+    "django_celery_beat",
 ]
 
 
@@ -195,3 +197,11 @@ EMAIL_HOST = config("EMAIL_HOST")
 EMAIL_PORT = config("EMAIL_PORT")
 EMAIL_HOST_USER = config("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD")
+
+CELERY_BROKER_URL = config(
+    "CELERY_BROKER_URL",
+    "redis://localhost:6379/0",
+)
+CELERY_RESULT_BACKEND = "django-db"
+CELERY_RESULT_EXTENDED = True
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True

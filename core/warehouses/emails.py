@@ -2,13 +2,11 @@
 Emails functions for the `core` app.
 """
 
-from django.conf import settings
-from django.core.mail import send_mail
 from django.template.loader import render_to_string
-from django.utils.html import strip_tags
 
 from core.custom_user.models import User
 from core.warehouses.models import Stock
+from core.warehouses.tasks import send_email_task
 
 
 def send_low_stock_alert(
@@ -32,15 +30,14 @@ def send_low_stock_alert(
         "recipients": recipients,
     }
 
-    html_message = render_to_string("warehouses/emails/low_stock_alert.html", context)
-    plain_message = strip_tags(html_message)
+    html_message = render_to_string(
+        "warehouses/emails/low_stock_alert.html",
+        context,
+    )
 
     for recipient_email in recipients:
-        send_mail(
+        send_email_task.delay(
+            email=recipient_email,
             subject=subject,
-            message=plain_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[recipient_email],
-            fail_silently=False,
             html_message=html_message,
         )
