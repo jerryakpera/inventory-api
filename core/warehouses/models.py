@@ -8,6 +8,9 @@ from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.utils.text import slugify
 
+from core.custom_user.models import User
+from core.products.models import ProductVariant
+
 
 class Warehouse(models.Model):
     """
@@ -363,3 +366,134 @@ class StockTransfer(models.Model):
             to_stock.save()
 
             super().save(*args, **kwargs)
+
+
+class StockAudit(models.Model):
+    """
+    Represents a stock audit for a specific product variant in a warehouse.
+    """
+
+    warehouse = models.ForeignKey(
+        Warehouse,
+        on_delete=models.CASCADE,
+        related_name="stock_audits",
+    )
+    product_variant = models.ForeignKey(
+        ProductVariant,
+        on_delete=models.CASCADE,
+        related_name="stock_audits",
+    )
+    counted_quantity = models.PositiveIntegerField(
+        help_text="The quantity of stock counted during the audit.",
+    )
+    recorded_quantity = models.PositiveIntegerField(
+        help_text="The expected quantity in the system before the audit.",
+    )
+    discrepancy = models.IntegerField(
+        help_text="The difference between recorded and counted stock.",
+    )
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="stock_audits",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        """
+        Calculate the discrepancy before saving.
+
+        Parameters
+        ----------
+        *args : tuple
+            The positional arguments.
+        **kwargs : dict
+            The keyword arguments.
+        """
+
+        self.discrepancy = self.counted_quantity - self.recorded_quantity
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        """
+        Return a string representation of the stock audit.
+
+        Returns
+        -------
+        str
+            The string representation.
+        """
+        return (
+            f"Audit for {self.product_variant} in {self.warehouse} "
+            f"on {self.created_at.strftime('%Y-%m-%d')}"
+        )
+
+
+class StockAdjustment(models.Model):
+    """
+    Represents a manual stock adjustment due to damage, loss, or expiration.
+    """
+
+    REASON_CHOICES = [
+        ("DAMAGE", "Damaged"),
+        ("LOSS", "Lost"),
+        ("EXPIRY", "Expired"),
+        ("AUDIT_CORRECTION", "Audit Correction"),
+    ]
+
+    warehouse = models.ForeignKey(
+        Warehouse,
+        on_delete=models.CASCADE,
+        related_name="stock_adjustments",
+    )
+    product_variant = models.ForeignKey(
+        ProductVariant,
+        on_delete=models.CASCADE,
+        related_name="stock_adjustments",
+    )
+    adjustment_quantity = models.IntegerField(
+        help_text="Positive to add stock, negative to reduce stock.",
+    )
+    reason = models.CharField(max_length=50, choices=REASON_CHOICES)
+    created_by = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="stock_adjustments",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        """
+        Adjust the product variant's stock quantity before saving.
+
+        Parameters
+        ----------
+        *args : tuple
+            The positional arguments.
+        **kwargs : dict
+            The keyword arguments.
+        """
+        with transaction.atomic():
+            inventory = Stock.objects.get(
+                warehouse=self.warehouse,
+                product_variant=self.product_variant,
+            )
+            inventory.quantity += self.adjustment_quantity
+            inventory.save()
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        """
+        Return a string representation of the stock adjustment.
+
+        Returns
+        -------
+        str
+            The string representation.
+        """
+        return (
+            f"Adjustment of {self.adjustment_quantity} for "
+            f"{self.product_variant} in {self.warehouse}"
+        )
