@@ -100,6 +100,14 @@ class WarehouseUser(models.Model):
         ("STAFF", "Staff"),
     ]
 
+    class RoleChoices:
+        """
+        Provide a class-based interface for role choices.
+        """
+
+        MANAGER = "MANAGER"
+        STAFF = "STAFF"
+
     user = models.ForeignKey(
         "custom_user.User",
         on_delete=models.CASCADE,
@@ -168,6 +176,59 @@ class Stock(models.Model):
             The string representation.
         """
         return f"{self.product_variant} - {self.quantity} in {self.warehouse}"
+
+    def save(self, *args, **kwargs):
+        """
+        Override save method to check for low stock and trigger alerts.
+
+        Parameters
+        ----------
+        *args : tuple
+            The positional arguments.
+        **kwargs : dict
+            The keyword arguments.
+        """
+        super().save(*args, **kwargs)
+
+        if self.quantity <= self.low_stock_threshold:
+            # Trigger low stock alert
+            StockAlert.objects.create(
+                stock=self,
+                alert_type="LOW_STOCK" if self.quantity > 0 else "OUT_OF_STOCK",
+            )
+
+
+class StockAlert(models.Model):
+    """
+    Stores stock alerts for low stock and out-of-stock notifications.
+    """
+
+    ALERT_TYPES = [
+        ("LOW_STOCK", "Low Stock"),
+        ("OUT_OF_STOCK", "Out of Stock"),
+    ]
+
+    stock = models.ForeignKey(
+        Stock,
+        on_delete=models.CASCADE,
+        related_name="alerts",
+    )
+    alert_type = models.CharField(
+        max_length=20,
+        choices=ALERT_TYPES,
+    )
+    created = models.DateTimeField(auto_now_add=True, editable=False)
+
+    def __str__(self):
+        """
+        Return a string representation of the stock alert.
+
+        Returns
+        -------
+        str
+            The string representation.
+        """
+        return f"{self.stock.product_variant} - {self.get_alert_type_display()}"
 
 
 class StockTransfer(models.Model):

@@ -4,7 +4,22 @@ Admin configuration for the `warehouses` app.
 
 from django.contrib import admin
 
-from .models import Stock, StockTransfer, Warehouse
+from .models import Stock, StockAlert, StockTransfer, Warehouse, WarehouseUser
+
+admin.site.register(StockAlert)
+
+
+@admin.register(WarehouseUser)
+class WarehouseUserAdmin(admin.ModelAdmin):
+    """
+    Admin configuration for the `WarehouseUser` model.
+    """
+
+    list_display = ("user", "warehouse", "role")
+    search_fields = ("user__email", "warehouse__name")
+    list_filter = ("role",)
+    ordering = ("warehouse", "user")
+    raw_id_fields = ("user", "warehouse")
 
 
 @admin.register(Warehouse)
@@ -27,7 +42,7 @@ class StockAdmin(admin.ModelAdmin):
     Admin configuration for the `Stock` model.
     """
 
-    list_display = ("warehouse", "product_variant", "quantity", "low_stock_threshold")
+    list_display = ("product_variant", "warehouse", "quantity", "low_stock_threshold")
     search_fields = ("warehouse__name", "product_variant__name")
     list_filter = ("warehouse",)
     ordering = ("warehouse", "product_variant")

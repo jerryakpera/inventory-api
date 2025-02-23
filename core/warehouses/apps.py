@@ -12,3 +12,9 @@ class WarehousesConfig(AppConfig):
 
     default_auto_field = "django.db.models.BigAutoField"
     name = "core.warehouses"
+
+    def ready(self):
+        """
+        Import signals.
+        """
+        import core.warehouses.signals
