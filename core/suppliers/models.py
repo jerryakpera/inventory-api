@@ -82,16 +82,19 @@ class SupplierProduct(models.Model):
         Supplier,
         on_delete=models.CASCADE,
         related_name="products",
+        help_text="Supplier who provides the product.",
     )
     product_variant = models.ForeignKey(
         ProductVariant,
         on_delete=models.CASCADE,
         related_name="suppliers",
+        help_text="The product provided by the supplier.",
     )
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         validators=[MinValueValidator(0)],
+        help_text="Price of the product.",
     )
 
     created = models.DateTimeField(auto_now_add=True)

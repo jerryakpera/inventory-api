@@ -10,6 +10,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from core.products import views as product_views
+from core.suppliers import views as supplier_views
 from core.warehouses import views as warehouse_views
 
 router = DefaultRouter()
@@ -26,6 +27,9 @@ router.register(r"stock-transfers", warehouse_views.StockTransferViewSet)
 router.register(r"stock-adjustments", warehouse_views.StockAdjustmentViewSet)
 router.register(r"stock-audits", warehouse_views.StockAuditViewSet)
 router.register(r"stock-alert", warehouse_views.StockAlertViewSet)
+
+router.register(r"suppliers", supplier_views.SupplierViewSet)
+router.register(r"supplier-products", supplier_views.SupplierProductViewSet)
 
 
 urlpatterns = [
