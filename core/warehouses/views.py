@@ -8,6 +8,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from core.products.pagination import StandardPagination
+from core.warehouses import permissions as warehouse_permissions
 
 from . import models as warehouse_models
 from . import serializers as warehouse_serializers
@@ -21,7 +22,7 @@ class WarehouseViewSet(viewsets.ModelViewSet):
     pagination_class = StandardPagination
     queryset = warehouse_models.Warehouse.objects.all().order_by("id")
     serializer_class = warehouse_serializers.WarehouseSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    permission_classes = [warehouse_permissions.IsWarehouseManagerOrReadOnly]
     authentication_classes = [
         authentication.SessionAuthentication,
         JWTAuthentication,
@@ -159,7 +160,7 @@ class StockAdjustmentViewSet(viewsets.ModelViewSet):
     pagination_class = StandardPagination
     queryset = warehouse_models.StockAdjustment.objects.all().order_by("id")
     serializer_class = warehouse_serializers.StockAdjustmentSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [warehouse_permissions.IsWarehouseManagerOrReadOnly]
     authentication_classes = [
         authentication.SessionAuthentication,
         JWTAuthentication,

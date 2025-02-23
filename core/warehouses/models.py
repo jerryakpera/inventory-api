@@ -194,6 +194,12 @@ class Stock(models.Model):
         super().save(*args, **kwargs)
 
         if self.quantity <= self.low_stock_threshold:
+            # Check if an active alert already exists
+            active_alert = StockAlert.objects.filter(stock=self, is_active=True).first()
+
+            if active_alert:
+                return
+
             # Trigger low stock alert
             StockAlert.objects.create(
                 stock=self,
@@ -221,6 +227,7 @@ class StockAlert(models.Model):
         choices=ALERT_TYPES,
     )
     created = models.DateTimeField(auto_now_add=True, editable=False)
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         """
@@ -333,7 +340,7 @@ class StockTransfer(models.Model):
         **kwargs : dict
             The keyword arguments.
         """
-        self.clean()  # Ensure validation
+        self.clean()
 
         with transaction.atomic():
             # Lock stock row for update to prevent race conditions
@@ -485,6 +492,12 @@ class StockAdjustment(models.Model):
             )
             inventory.quantity += self.adjustment_quantity
             inventory.save()
+
+        if (
+            self.adjustment_quantity < 0
+            and abs(self.adjustment_quantity) > self.stock.quantity
+        ):
+            raise ValidationError("Insufficient stock for adjustment.")
 
         super().save(*args, **kwargs)
 
