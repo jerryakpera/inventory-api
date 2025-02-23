@@ -19,11 +19,23 @@ class Warehouse(models.Model):
         ("SHOP", "Shop"),
     ]
 
+    VISIBILITY_CHOICES = [
+        ("PUBLIC", "Public"),
+        ("PRIVATE", "Private"),
+    ]
+
     type = models.CharField(
         max_length=20,
         choices=TYPE_CHOICES,
         default="STORAGE",
         help_text="The type of warehouse.",
+    )
+
+    visibility = models.CharField(
+        max_length=20,
+        choices=VISIBILITY_CHOICES,
+        default="PRIVATE",
+        help_text="Determines if the warehouse is visible to the public.",
     )
 
     author = models.ForeignKey(
