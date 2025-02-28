@@ -78,6 +78,10 @@ class ProductSerializer(serializers.ModelSerializer):
         queryset=ProductCategory.objects.all()
     )
 
+    category_name = serializers.CharField(
+        source="category.name",
+        read_only=True,
+    )
     variant_count = serializers.IntegerField(read_only=True)
 
     def to_representation(self, instance):
