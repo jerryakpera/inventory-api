@@ -35,6 +35,10 @@ router.register(r"supplier-products", supplier_views.SupplierProductViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path(
+        "api/token/logout/",
+        custom_user_views.LogoutView.as_view(),
+    ),
     path("api/v1/users/me/", custom_user_views.get_current_user),
     path("api/v1/", include(router.urls)),
     # path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
