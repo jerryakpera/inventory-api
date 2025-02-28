@@ -9,6 +9,7 @@ from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
+from core.custom_user import views as custom_user_views
 from core.products import views as product_views
 from core.suppliers import views as supplier_views
 from core.warehouses import views as warehouse_views
@@ -34,9 +35,19 @@ router.register(r"supplier-products", supplier_views.SupplierProductViewSet)
 
 urlpatterns = [
     path("admin/", admin.site.urls),
+    path("api/v1/users/me/", custom_user_views.get_current_user),
     path("api/v1/", include(router.urls)),
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    # path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    path(
+        "api/token/",
+        custom_user_views.CustomTokenObtainPairView.as_view(),
+        name="token_obtain_pair",
+    ),
+    path(
+        "api/token/refresh/",
+        custom_user_views.CustomTokenRefreshView.as_view(),
+        name="token_refresh",
+    ),
 ]
 
 if settings.DEBUG:

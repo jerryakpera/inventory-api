@@ -54,6 +54,7 @@ THIRD_PARTY_APPS = [
     "simple_history",
     "django_celery_results",
     "django_celery_beat",
+    "corsheaders",
 ]
 
 
@@ -68,6 +69,7 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -186,8 +188,10 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_COOKIE_SECURE": True,
+    "AUTH_COOKIE_HTTP_ONLY": True,  # Prevent JS access
 }
 
 
@@ -207,3 +211,26 @@ CELERY_BROKER_URL = config(
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_RESULT_EXTENDED = True
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+
+# CORS
+CORS_ALLOW_CREDENTIALS = True
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:5173",
+]
+CORS_ORIGIN_WHITELIST = [
+    "http://localhost:5173",
+    # other origins...
+]
+
+# ✅ Important for allowing cross-origin cookies
+SESSION_COOKIE_SAMESITE = None
+
+# ✅ Only False in development (must be True in production)
+# Use DEBUG to set this value
+SESSION_COOKIE_SECURE = False if DEBUG else True
+
+CSRF_COOKIE_SAMESITE = None
+CSRF_COOKIE_SECURE = False
+
+APPEND_SLASH = False
