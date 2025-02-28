@@ -3,9 +3,11 @@ Tasks for the `accounts` app.
 """
 
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.core.mail import send_mail
 
 from celery import shared_task
+from core.products.models import Product
 
 
 @shared_task(name="send_email_task")

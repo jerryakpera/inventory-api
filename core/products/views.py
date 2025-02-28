@@ -44,13 +44,14 @@ class ProductViewSet(viewsets.ModelViewSet):
         serializer : ProductSerializer
             The serializer instance used to create the product.
         """
+
         try:
             serializer.save(author=self.request.user)
         except IntegrityError as e:
             if "products_product_slug_key" in str(e):
                 raise ValidationError(
                     {
-                        "slug": ["A product with this slug already exists."],
+                        "slug": ["A similar product already exists."],
                     }
                 )
             raise ValidationError(
