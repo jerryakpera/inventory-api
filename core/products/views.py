@@ -5,7 +5,7 @@ Views for the `products` app.
 from django.db.utils import IntegrityError
 from rest_framework import authentication, permissions, viewsets
 from rest_framework.exceptions import ValidationError
-from rest_framework.filters import SearchFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from . import models as product_models
@@ -27,8 +27,12 @@ class ProductViewSet(viewsets.ModelViewSet):
         JWTAuthentication,
     ]
 
-    filter_backends = [SearchFilter]
+    filter_backends = [SearchFilter, OrderingFilter]
+
     search_fields = ["name", "slug", "category__name", "description"]
+    ordering_fields = ["name", "category", "unit", "is_active", "updated"]
+
+    ordering = ["id"]
 
     def perform_create(self, serializer):
         """
@@ -68,8 +72,12 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
         JWTAuthentication,
     ]
 
-    filter_backends = [SearchFilter]
+    filter_backends = [SearchFilter, OrderingFilter]
+
+    ordering_fields = ["name", "updated"]
     search_fields = ["name", "slug", "description"]
+
+    ordering = ["id"]
 
     def perform_create(self, serializer):
         """
@@ -126,8 +134,12 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
         JWTAuthentication,
     ]
 
-    filter_backends = [SearchFilter]
+    filter_backends = [SearchFilter, OrderingFilter]
+
+    ordering_fields = ["name", "product", "flavor", "brand", "is_active", "updated"]
     search_fields = ["name", "slug", "product__name", "description", "flavor", "brand"]
+
+    ordering = ["id"]
 
     def perform_create(self, serializer):
         """
