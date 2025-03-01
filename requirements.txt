@@ -50,6 +50,7 @@ django==5.1.1
     #   django-celery-beat
     #   django-celery-results
     #   django-cors-headers
+    #   django-filter
     #   django-simple-history
     #   django-storages
     #   django-taggit
@@ -62,6 +63,8 @@ django-celery-beat==2.7.0
 django-celery-results===2.5.1
     # via -r requirements.in
 django-cors-headers==4.7.0
+    # via -r requirements.in
+django-filter==25.1
     # via -r requirements.in
 django-simple-history==3.8.0
     # via -r requirements.in

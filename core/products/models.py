@@ -93,14 +93,16 @@ class Product(models.Model):
 
     author = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="products",
     )
     name = models.CharField(max_length=100)
 
     category = models.ForeignKey(
         "ProductCategory",
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="products",
         null=True,
         blank=True,
@@ -115,8 +117,10 @@ class Product(models.Model):
 
     unit = models.ForeignKey(
         ProductUnit,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="products",
+        null=True,
+        blank=True,
     )
 
     image = models.ImageField(
@@ -215,12 +219,16 @@ class ProductVariant(models.Model):
 
     author = models.ForeignKey(
         User,
-        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
         related_name="product_variants",
     )
     product = models.ForeignKey(
         Product,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
         related_name="variants",
     )
 

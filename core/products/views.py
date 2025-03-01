@@ -3,6 +3,7 @@ Views for the `products` app.
 """
 
 from django.db.utils import IntegrityError
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import authentication, permissions, viewsets
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -27,8 +28,9 @@ class ProductViewSet(viewsets.ModelViewSet):
         JWTAuthentication,
     ]
 
-    filter_backends = [SearchFilter, OrderingFilter]
+    filter_backends = [SearchFilter, OrderingFilter, DjangoFilterBackend]
 
+    filterset_fields = ["category", "unit", "is_active"]
     search_fields = ["name", "slug", "category__name", "description"]
     ordering_fields = ["name", "category", "unit", "is_active", "updated"]
 
