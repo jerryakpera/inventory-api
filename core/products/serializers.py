@@ -3,9 +3,9 @@ Serializers for the products app.
 """
 
 from rest_framework import serializers
+from taggit.serializers import TaggitSerializer, TagListSerializerField
 
 from core.custom_user.models import User
-from core.custom_user.serializers import UserSerializer
 
 from .models import (
     Product,
@@ -31,7 +31,7 @@ class ProductUnitSerializer(serializers.ModelSerializer):
         }
 
 
-class ProductSerializer(serializers.ModelSerializer):
+class ProductSerializer(TaggitSerializer, serializers.ModelSerializer):
     """
     Serializer for the Product model.
     """
@@ -51,6 +51,8 @@ class ProductSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     variant_count = serializers.IntegerField(read_only=True)
+
+    tags = TagListSerializerField()
 
     def to_representation(self, instance):
         """

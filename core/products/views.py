@@ -4,9 +4,11 @@ Views for the `products` app.
 
 from django.db.utils import IntegrityError
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import authentication, permissions, viewsets
+from rest_framework import authentication, permissions, status, viewsets
+from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.filters import OrderingFilter, SearchFilter
+from rest_framework.response import Response
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
 from . import models as product_models
@@ -32,7 +34,7 @@ class ProductViewSet(viewsets.ModelViewSet):
 
     filterset_fields = ["category", "unit", "is_active"]
     search_fields = ["name", "slug", "category__name", "description"]
-    ordering_fields = ["name", "category", "unit", "is_active", "updated"]
+    ordering_fields = ["name", "category", "unit", "is_active", "updated", "created"]
 
     ordering = ["id"]
 
@@ -59,6 +61,39 @@ class ProductViewSet(viewsets.ModelViewSet):
             raise ValidationError(
                 {"error": "An unexpected database error occurred."},
             )
+
+    @action(detail=False, methods=["post"], url_path="bulk-delete")
+    def bulk_delete(self, request):
+        """
+        Custom action to delete multiple products at once.
+
+        Parameters
+        ----------
+        request : Request
+            The request object.
+
+        Returns
+        -------
+        Response
+            The response object.
+        """
+        product_ids = request.data.get("ids", [])
+
+        if not isinstance(product_ids, list) or not product_ids:
+            return Response(
+                {"error": "Please provide a list of product IDs."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        deleted_count, _ = product_models.Product.objects.filter(
+            id__in=product_ids
+        ).delete()
+        return Response(
+            {
+                "message": f"Successfully deleted {deleted_count} products.",
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class ProductCategoryViewSet(viewsets.ModelViewSet):
@@ -120,6 +155,39 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
             raise ValidationError(
                 {"error": "An unexpected database error occurred."},
             )
+
+    @action(detail=False, methods=["post"], url_path="bulk-delete")
+    def bulk_delete(self, request):
+        """
+        Custom action to delete multiple categories at once.
+
+        Parameters
+        ----------
+        request : Request
+            The request object.
+
+        Returns
+        -------
+        Response
+            The response object.
+        """
+        categories_ids = request.data.get("ids", [])
+
+        if not isinstance(categories_ids, list) or not categories_ids:
+            return Response(
+                {"error": "Please provide a list of category IDs."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        deleted_count, _ = product_models.ProductCategory.objects.filter(
+            id__in=categories_ids
+        ).delete()
+        return Response(
+            {
+                "message": f"Successfully deleted {deleted_count} categories.",
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class ProductUnitViewSet(viewsets.ModelViewSet):

@@ -109,7 +109,8 @@ class Product(models.Model):
     )
 
     tags = TaggableManager(
-        help_text="Use tags to add health benefits, Hair growth, etc.",
+        help_text="Use tags to add further categorization to products.",
+        blank=True,
     )
 
     description = models.TextField(null=True, blank=True)
