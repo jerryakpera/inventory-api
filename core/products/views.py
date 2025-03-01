@@ -80,6 +80,20 @@ class ProductCategoryViewSet(viewsets.ModelViewSet):
 
     ordering = ["id"]
 
+    def get_serializer_class(self):
+        """
+        Return the appropriate serializer based on the request type.
+
+        Returns
+        -------
+        ProductCategorySerializer or ProductCategoryDetailSerializer
+            The appropriate serializer based on the request type.
+        """
+        if self.action == "retrieve":
+            return product_serializers.ProductCategoryDetailSerializer
+
+        return product_serializers.ProductCategorySerializer
+
     def perform_create(self, serializer):
         """
         Set the current authenticated user as the author when

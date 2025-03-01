@@ -31,38 +31,6 @@ class ProductUnitSerializer(serializers.ModelSerializer):
         }
 
 
-class ProductCategorySerializer(serializers.ModelSerializer):
-    """
-    Serializer for the ProductCategory model.
-    """
-
-    product_count = serializers.SerializerMethodField()
-
-    def get_product_count(self, obj):
-        """
-        Return the number of products associated with this category.
-
-        Parameters
-        ----------
-        obj : ProductCategory
-            The product category instance.
-
-        Returns
-        -------
-        int
-            The number of products associated with this category.
-        """
-        return obj.products.count()
-
-    class Meta:
-        model = ProductCategory
-        fields = "__all__"
-        extra_kwargs = {
-            "slug": {"required": False},
-            "author": {"required": False},
-        }
-
-
 class ProductSerializer(serializers.ModelSerializer):
     """
     Serializer for the Product model.
@@ -109,6 +77,71 @@ class ProductSerializer(serializers.ModelSerializer):
             "author": {"required": False},
             "is_active": {"required": False},
             "slug": {"required": False, "read_only": True},
+        }
+
+
+class ProductCategoryDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the ProductCategory model.
+    """
+
+    product_count = serializers.SerializerMethodField()
+    products = ProductSerializer(many=True, read_only=True)
+
+    def get_product_count(self, obj):
+        """
+        Return the number of products associated with this category.
+
+        Parameters
+        ----------
+        obj : ProductCategory
+            The product category instance.
+
+        Returns
+        -------
+        int
+            The number of products associated with this category.
+        """
+        return obj.products.count()
+
+    class Meta:
+        model = ProductCategory
+        fields = "__all__"
+        extra_kwargs = {
+            "slug": {"required": False},
+            "author": {"required": False},
+        }
+
+
+class ProductCategorySerializer(serializers.ModelSerializer):
+    """
+    Serializer for the ProductCategory model.
+    """
+
+    product_count = serializers.SerializerMethodField()
+
+    def get_product_count(self, obj):
+        """
+        Return the number of products associated with this category.
+
+        Parameters
+        ----------
+        obj : ProductCategory
+            The product category instance.
+
+        Returns
+        -------
+        int
+            The number of products associated with this category.
+        """
+        return obj.products.count()
+
+    class Meta:
+        model = ProductCategory
+        fields = "__all__"
+        extra_kwargs = {
+            "slug": {"required": False},
+            "author": {"required": False},
         }
 
 
