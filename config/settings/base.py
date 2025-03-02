@@ -197,6 +197,14 @@ SIMPLE_JWT = {
     "AUTH_COOKIE_SAMESITE": "None",
 }
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_COOKIE_SECURE": True,
+    "AUTH_COOKIE_HTTP_ONLY": True,
+    "AUTH_COOKIE_SAMESITE": "None",
+}
+
 
 # EMAIL CONFIG
 ACCOUNT_EMAIL_SUBJECT_PREFIX = ""
@@ -231,9 +239,9 @@ CORS_ORIGIN_WHITELIST = [
 # ✅ Important for allowing cross-origin cookies
 
 # ✅ Only False in development (must be True in production)
-SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_SAMESITE = "None"
 SESSION_COOKIE_SECURE = False if DEBUG else True  # ✅ Must be True in production
-CSRF_COOKIE_SAMESITE = None
+CSRF_COOKIE_SAMESITE = "None"
 CSRF_COOKIE_SECURE = False if DEBUG else True  # ✅ Must be True in production
 
 
