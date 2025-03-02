@@ -42,8 +42,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             key="refresh_token",
             value=response.data.pop("refresh"),  # Remove from response, keep in cookie
             httponly=True,
-            secure=True,  # HTTPS only in production
-            samesite="Lax",
+            secure=True,  # Must be True to use SameSite=None
+            samesite="None",  # Allow cross-site cookie usage
         )
 
         return response
