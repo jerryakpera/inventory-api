@@ -19,13 +19,12 @@ DATABASES = {
 
 DATABASES["default"] = dj_database_url.parse(config("DATABASE_URL"))
 
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    "AUTH_COOKIE": "refresh_token",
-    "AUTH_COOKIE_DOMAIN": ".onrender.com",
-    "AUTH_COOKIE_SECURE": True,
-    "AUTH_COOKIE_HTTP_ONLY": True,
-    "AUTH_COOKIE_PATH": "/",
-    "AUTH_COOKIE_SAMESITE": "None",
-}
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False
+
+CORS_ALLOWED_ORIGINS = [
+    "https://inventory-app-d7569.web.app",
+]
+CSRF_TRUSTED_ORIGINS = [
+    "https://inventory-app-d7569.web.app",
+]

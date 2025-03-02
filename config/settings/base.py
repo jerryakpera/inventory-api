@@ -207,28 +207,19 @@ CELERY_RESULT_BACKEND = "django-db"
 CELERY_RESULT_EXTENDED = True
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
-
-# CORS
-CORS_ORIGIN_ALLOW_ALL = True
-
-# ✅ Only False in development (must be True in production)
-SESSION_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_DOMAIN = ".onrender.com"
-SESSION_COOKIE_SECURE = False if DEBUG else True
-
-CSRF_COOKIE_SAMESITE = "None"
-CSRF_COOKIE_SECURE = False if DEBUG else True
-
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_COOKIE_SECURE": True,
+    "AUTH_COOKIE_HTTP_ONLY": True,
+    "AUTH_COOKIE_SAMESITE": "None",
+}
 
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = True
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-    "https://inventory-app-d7569.web.app",
-]
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "https://inventory-app-d7569.web.app",
-]
+
+CSRF_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_DOMAIN = ".onrender.com"
+
 
 APPEND_SLASH = False
