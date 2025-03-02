@@ -219,9 +219,11 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
+    "https://inventory-api-ftrn.onrender.com",
 ]
 CORS_ORIGIN_WHITELIST = [
     "http://localhost:5173",
+    "https://inventory-api-ftrn.onrender.com",
     # other origins...
 ]
 
