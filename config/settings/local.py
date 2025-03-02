@@ -2,6 +2,8 @@
 Settings to be used during development.
 """
 
+from datetime import timedelta
+
 from decouple import config
 
 from .base import *
@@ -14,4 +16,12 @@ DATABASES = {
         "PASSWORD": config("POSTGRES_PASSWORD"),
         "HOST": "localhost",
     }
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_COOKIE_SECURE": True,
+    "AUTH_COOKIE_HTTP_ONLY": True,
+    "AUTH_COOKIE_SAMESITE": "None",
 }
