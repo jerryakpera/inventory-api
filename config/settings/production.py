@@ -18,13 +18,3 @@ DATABASES = {
 }
 
 DATABASES["default"] = dj_database_url.parse(config("DATABASE_URL"))
-
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = False
-
-CORS_ALLOWED_ORIGINS = [
-    "https://inventory-app-d7569.web.app",
-]
-CSRF_TRUSTED_ORIGINS = [
-    "https://inventory-app-d7569.web.app",
-]

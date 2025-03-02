@@ -17,14 +17,3 @@ DATABASES = {
         "HOST": "localhost",
     }
 }
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-]
-
-CSRF_COOKIE_SECURE = False
-SESSION_COOKIE_SECURE = False
-
-CSRF_TRUSTED_ORIGINS = [
-    "http://localhost:5173",
-]
