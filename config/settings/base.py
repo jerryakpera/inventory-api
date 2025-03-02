@@ -71,9 +71,9 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -215,11 +215,11 @@ SIMPLE_JWT = {
     "AUTH_COOKIE_SAMESITE": "None",
 }
 
-CORS_ALLOW_CREDENTIALS = True
-
-CSRF_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_DOMAIN = ".onrender.com"
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://inventory-app-d7569",
+    "https://inventory-app-d7569.firebaseapp.com",
+    "https://inventory-app-d7569.web.app",
+]
 
 APPEND_SLASH = False
