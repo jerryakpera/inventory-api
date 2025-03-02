@@ -89,6 +89,8 @@ faker==28.0.0
     # via -r requirements.in
 flower==2.0.1
     # via -r requirements.in
+gunicorn==23.0.0
+    # via -r requirements.in
 humanize==4.12.1
     # via flower
 idna==3.10
@@ -99,6 +101,8 @@ jmespath==1.0.1
     #   botocore
 kombu==5.4.2
     # via celery
+packaging==24.2
+    # via gunicorn
 pillow==10.4.0
     # via -r requirements.in
 prometheus-client==0.21.1
