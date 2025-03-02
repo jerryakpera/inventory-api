@@ -194,6 +194,7 @@ SIMPLE_JWT = {
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "AUTH_COOKIE_SECURE": True,
     "AUTH_COOKIE_HTTP_ONLY": True,
+    "AUTH_COOKIE_SAMESITE": "None",
 }
 
 
@@ -228,13 +229,12 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 # ✅ Important for allowing cross-origin cookies
-SESSION_COOKIE_SAMESITE = None
 
 # ✅ Only False in development (must be True in production)
-# Use DEBUG to set this value
-SESSION_COOKIE_SECURE = False if DEBUG else True
-
+SESSION_COOKIE_SAMESITE = None
+SESSION_COOKIE_SECURE = False if DEBUG else True  # ✅ Must be True in production
 CSRF_COOKIE_SAMESITE = None
-CSRF_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False if DEBUG else True  # ✅ Must be True in production
+
 
 APPEND_SLASH = False
