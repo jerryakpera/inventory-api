@@ -211,7 +211,7 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 # CORS
 SESSION_COOKIE_DOMAIN = ".onrender.com"
 CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = True
+CORS_ORIGIN_ALLOW_ALL = True
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "https://inventory-app-d7569.web.app",
