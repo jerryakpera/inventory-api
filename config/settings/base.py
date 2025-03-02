@@ -209,26 +209,26 @@ CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 
 
 # CORS
-SESSION_COOKIE_DOMAIN = ".onrender.com"
-CORS_ALLOW_CREDENTIALS = True
 CORS_ORIGIN_ALLOW_ALL = True
+
+# ✅ Only False in development (must be True in production)
+SESSION_COOKIE_SAMESITE = "None"
+SESSION_COOKIE_DOMAIN = ".onrender.com"
+SESSION_COOKIE_SECURE = False if DEBUG else True
+
+CSRF_COOKIE_SAMESITE = "None"
+CSRF_COOKIE_SECURE = False if DEBUG else True
+
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS = [
     "http://localhost:5173",
     "https://inventory-app-d7569.web.app",
 ]
-# CORS_ORIGIN_WHITELIST = [
-#     "http://localhost:5173",
-#     "https://inventory-app-d7569.web.app",
-#     # other origins...
-# ]
-
-# ✅ Important for allowing cross-origin cookies
-
-# ✅ Only False in development (must be True in production)
-SESSION_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SECURE = False if DEBUG else True
-CSRF_COOKIE_SAMESITE = "None"
-CSRF_COOKIE_SECURE = False if DEBUG else True
-
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "https://inventory-app-d7569.web.app",
+]
 
 APPEND_SLASH = False
