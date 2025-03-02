@@ -16,21 +16,6 @@ from .models import (
 )
 
 
-class ProductUnitSerializer(serializers.ModelSerializer):
-    """
-    Serializer for the ProductUnit model.
-    """
-
-    class Meta:
-        model = ProductUnit
-        fields = "__all__"
-
-        extra_kwargs = {
-            "author": {"required": False},
-            "slug": {"required": False},
-        }
-
-
 class ProductSerializer(TaggitSerializer, serializers.ModelSerializer):
     """
     Serializer for the Product model.
@@ -48,6 +33,10 @@ class ProductSerializer(TaggitSerializer, serializers.ModelSerializer):
 
     category_name = serializers.CharField(
         source="category.name",
+        read_only=True,
+    )
+    unit_symbol = serializers.CharField(
+        source="unit.symbol",
         read_only=True,
     )
     variant_count = serializers.IntegerField(read_only=True)
@@ -79,6 +68,40 @@ class ProductSerializer(TaggitSerializer, serializers.ModelSerializer):
             "author": {"required": False},
             "is_active": {"required": False},
             "slug": {"required": False, "read_only": True},
+        }
+
+
+class ProductUnitSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the ProductUnit model.
+    """
+
+    product_count = serializers.SerializerMethodField()
+    products = ProductSerializer(many=True, read_only=True)
+
+    def get_product_count(self, obj):
+        """
+        Return the number of products associated with this unit.
+
+        Parameters
+        ----------
+        obj : ProductCategory
+            The product unit instance.
+
+        Returns
+        -------
+        int
+            The number of products associated with this unit.
+        """
+        return obj.products.count()
+
+    class Meta:
+        model = ProductUnit
+        fields = "__all__"
+
+        extra_kwargs = {
+            "author": {"required": False},
+            "slug": {"required": False},
         }
 
 
@@ -167,16 +190,12 @@ class ProductVariantSerializer(serializers.ModelSerializer):
         source="product.name",
         read_only=True,
     )
-    description = serializers.CharField(
-        source="product.description",
-        read_only=True,
-    )
     category = serializers.CharField(
         source="product.category.name",
         read_only=True,
     )
     unit = serializers.CharField(
-        source="product.unit.name",
+        source="product.unit.symbol",
         read_only=True,
     )
 
@@ -199,6 +218,8 @@ class ProductVariantDetailSerializer(serializers.ModelSerializer):
     """
     Serializer for the ProductVariant model.
     """
+
+    product = ProductSerializer(read_only=True)
 
     class Meta:
         model = ProductVariant

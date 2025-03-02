@@ -204,6 +204,46 @@ class ProductUnitViewSet(viewsets.ModelViewSet):
         JWTAuthentication,
     ]
 
+    filter_backends = [SearchFilter, OrderingFilter]
+
+    ordering_fields = ["name"]
+    search_fields = ["name", "symbol"]
+
+    ordering = ["id"]
+
+    @action(detail=False, methods=["post"], url_path="bulk-delete")
+    def bulk_delete(self, request):
+        """
+        Custom action to delete multiple units at once.
+
+        Parameters
+        ----------
+        request : Request
+            The request object.
+
+        Returns
+        -------
+        Response
+            The response object.
+        """
+        units_ids = request.data.get("ids", [])
+
+        if not isinstance(units_ids, list) or not units_ids:
+            return Response(
+                {"error": "Please provide a list of unit IDs."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        deleted_count, _ = product_models.ProductUnit.objects.filter(
+            id__in=units_ids
+        ).delete()
+        return Response(
+            {
+                "message": f"Successfully deleted {deleted_count} units.",
+            },
+            status=status.HTTP_200_OK,
+        )
+
 
 class ProductVariantViewSet(viewsets.ModelViewSet):
     """
@@ -225,6 +265,20 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
     search_fields = ["name", "slug", "product__name", "description", "flavor", "brand"]
 
     ordering = ["id"]
+
+    def get_serializer_class(self):
+        """
+        Use ProductVariantDetailSerializer for retrieving a single product variant.
+
+        Returns
+        -------
+        ProductVariantSerializer or ProductVariantDetailSerializer
+            The appropriate serializer based on the request type.
+        """
+        if self.action == "retrieve":
+            return product_serializers.ProductVariantDetailSerializer
+
+        return product_serializers.ProductVariantSerializer
 
     def perform_create(self, serializer):
         """
@@ -250,6 +304,39 @@ class ProductVariantViewSet(viewsets.ModelViewSet):
             raise ValidationError(
                 {"error": "An unexpected database error occurred."},
             )
+
+    @action(detail=False, methods=["post"], url_path="bulk-delete")
+    def bulk_delete(self, request):
+        """
+        Custom action to delete multiple variants at once.
+
+        Parameters
+        ----------
+        request : Request
+            The request object.
+
+        Returns
+        -------
+        Response
+            The response object.
+        """
+        variant_ids = request.data.get("ids", [])
+
+        if not isinstance(variant_ids, list) or not variant_ids:
+            return Response(
+                {"error": "Please provide a list of variant IDs."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        deleted_count, _ = product_models.ProductVariant.objects.filter(
+            id__in=variant_ids
+        ).delete()
+        return Response(
+            {
+                "message": f"Successfully deleted {deleted_count} variants.",
+            },
+            status=status.HTTP_200_OK,
+        )
 
 
 class ProductPriceHistoryViewSet(viewsets.ModelViewSet):
