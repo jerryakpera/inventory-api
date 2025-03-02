@@ -44,9 +44,12 @@ colorama==0.4.6
     # via click
 cron-descriptor==1.4.5
     # via django-celery-beat
+dj-database-url==2.2.0
+    # via -r requirements.in
 django==5.1.1
     # via
     #   -r requirements.in
+    #   dj-database-url
     #   django-celery-beat
     #   django-celery-results
     #   django-cors-headers
@@ -130,6 +133,8 @@ sqlparse==0.5.1
     # via django
 tornado==6.4.2
     # via flower
+typing-extensions==4.12.2
+    # via dj-database-url
 tzdata==2024.2
     # via
     #   celery
