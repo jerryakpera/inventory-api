@@ -1,6 +1,6 @@
 #### Start celery
 
-celery --app=project.celery:app worker -l INFO
+celery --app=config.celery:app worker -l INFO
 
 <!-- Solo Worker Pool -->
 
