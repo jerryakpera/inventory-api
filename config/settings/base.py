@@ -218,9 +218,9 @@ SIMPLE_JWT = {
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://inventory-app-d7569",
-    "https://inventory-app-d7569.firebaseapp.com",
-    "https://inventory-app-d7569.web.app",
+    "https://one-stop-healthy-shop",
+    "https://one-stop-healthy-shop.firebaseapp.com",
+    "https://one-stop-healthy-shop.web.app",
 ]
 
 APPEND_SLASH = False
